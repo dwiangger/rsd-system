@@ -49,9 +49,9 @@ $active_group = 'default';
 $active_record = TRUE;
 
 $db['default']['hostname'] = 'localhost';
-$db['default']['username'] = 'dtvreporter';
-$db['default']['password'] = 'dsr123reporter456';
-$db['default']['database'] = 'dsr2db';
+$db['default']['username'] = 'dbuser';
+$db['default']['password'] = '123456';
+$db['default']['database'] = 'rsddb';
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;
