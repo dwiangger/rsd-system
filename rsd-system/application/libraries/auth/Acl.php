@@ -27,6 +27,14 @@ class Acl {
 	 */
 	var $CI;
 	/**
+	 * Role table name
+	 */
+	const ROLE_TABLE = 'acl_roles';
+	/**
+	 * User-Role table name
+	 */
+	const USER_ROLE_TABLE = 'acl_role_user';
+	/**
 	 * Role management method set 
 	 * A role has only unique [name] as identify and [description] 
 	 */
@@ -37,7 +45,7 @@ class Acl {
 	public function getRoles()
 	{
 		$list = array();
-		$query = $this->CI->db->get('acl_roles');
+		$query = $this->CI->db->get(self::ROLE_TABLE);
 		foreach ($query->result() as $row) {
 			array_push($list,$row);
 		}
@@ -52,7 +60,9 @@ class Acl {
 	public function getRole($roleName)
 	{
 		$query = $this->CI->db->query(
-			"SELECT * FROM `acl_roles` WHERE `name`=? LIMIT 1",
+			"SELECT * FROM `"
+			.$this->CI->db->dbprefix(self::ROLE_TABLE)
+			."` WHERE `name`=? LIMIT 1",
 			$roleName);
 		if ( $query->num_rows() != 1)
 		{
@@ -71,7 +81,9 @@ class Acl {
 	{
 		/* check existing role */
 		$query = $this->CI->db->query(
-			"SELECT * FROM `acl_roles` WHERE `name`=?"
+			"SELECT * FROM `"
+			.$this->CI->db->dbprefix(self::ROLE_TABLE)
+			."` WHERE `name`=?"
 			,$name);
 		if ( $query->num_rows() >= 1 )
 		{
@@ -82,7 +94,7 @@ class Acl {
 			'name' => $name, 
 			'description' => $description
 		);
-		$this->CI->db->insert('acl_roles',$item);
+		$this->CI->db->insert(self::ROLE_TABLE,$item);
 		return TRUE;
 	}
 	/**
@@ -97,7 +109,7 @@ class Acl {
 			'description' => $description
 		);
 		$this->CI->db->where('name',$name);
-		$this->CI->db->update('acl_roles',$item);
+		$this->CI->db->update(self::ROLE_TABLE,$item);
 		if ($this->CI->db->affected_rows() >= 1)
 		{
 			return TRUE;
@@ -112,7 +124,7 @@ class Acl {
 	public function deleteRole($name)
 	{
 		$this->CI->db->where('name',$name);
-		$this->CI->db->delete('acl_roles');
+		$this->CI->db->delete(self::ROLE_TABLE);
 		if ($this->CI->db->affected_rows() >= 1)
 		{
 			return TRUE;
@@ -130,13 +142,20 @@ class Acl {
 	 */
 	public function getUsersRolesMatrix()
 	{
+		$userTableName = $this->CI->authentication->getUserTableName(); 
+		$fullUserTableName = $this->CI->db->dbprefix($userTableName);
+		$fullRoleUserTableName = 
+			$this->CI->db->dbprefix(self::USER_ROLE_TABLE);
+		$fullRoleTableName = 
+			$this->CI->db->dbprefix(self::ROLE_TABLE);
+			
 		$this->CI->db->select('id,name,description');
-		$query = $this->CI->db->get('acl_roles');
+		$query = $this->CI->db->get(self::ROLE_TABLE);
 		$roles = $query->result_array();
 		$query->free_result();
 		
 		$this->CI->db->select('id,user_id');
-		$query = $this->CI->db->get('dsr2_users');
+		$query = $this->CI->db->get($fullUserTableName);
 		$users = $query->result_array();
 		$query->free_result();		
 
@@ -149,10 +168,14 @@ class Acl {
 			$matrix[$user['user_id']] = $item;
 		}
 		
-		$this->CI->db->select('dsr2_users.user_id AS user_id, acl_roles.name AS role_name, permission');
-		$this->CI->db->from('acl_role_user');
-		$this->CI->db->join('dsr2_users','acl_role_user.user_id=dsr2_users.id');
-		$this->CI->db->join('acl_roles','acl_role_user.role_id=acl_roles.id');
+		$this->CI->db->select($fullUserTableName.'.user_id AS user_id, '
+			.$fullRoleTableName.'.name AS role_name, '
+			.'permission');
+		$this->CI->db->from(self::USER_ROLE_TABLE);
+		$this->CI->db->join($userTableName,
+			self::USER_ROLE_TABLE.'.user_id='.$userTableName.'.id');
+		$this->CI->db->join(self::ROLE_TABLE,
+			self::USER_ROLE_TABLE.'.role_id='.self::ROLE_TABLE.'.id');
 		$this->CI->db->order_by('user_id,role_name');
 		
 		$query = $this->CI->db->get();
@@ -176,6 +199,13 @@ class Acl {
 	 */
 	public function updateUserRole($userId, $roleName, $permission = 1)
 	{
+		$userTableName = $this->CI->authentication->getUserTableName(); 
+		$fullUserTableName = $this->CI->db->dbprefix($userTableName);
+		$fullRoleUserTableName = 
+			$this->CI->db->dbprefix(self::USER_ROLE_TABLE);
+		$fullRoleTableName = 
+			$this->CI->db->dbprefix(self::ROLE_TABLE);
+			
 		/* Default, this record is not exist in db */
 		$exist = array(
 			'user_id' => 0,
@@ -183,12 +213,18 @@ class Acl {
 			'permission' => 0
 		);
 		/* looking for record for $userId-$role */
-		$this->CI->db->select('dsr2_users.id AS user_id,acl_roles.id AS role_id,permission');
-		$this->CI->db->from('acl_role_user');
-    	$this->CI->db->join('acl_roles','acl_roles.id=acl_role_user.role_id');
-    	$this->CI->db->join('dsr2_users','dsr2_users.id=acl_role_user.user_id');
-    	$this->CI->db->where('dsr2_users.user_id',$userId);
-    	$this->CI->db->where('acl_roles.name',$roleName);
+		$this->CI->db->select($fullUserTableName.'.id AS user_id, '
+			.$fullRoleTableName.'.id AS role_id, '
+			.'permission');
+		$this->CI->db->from(self::USER_ROLE_TABLE);
+    	$this->CI->db->join(self::ROLE_TABLE,
+    		self::ROLE_TABLE.'.id='.self::USER_ROLE_TABLE.'.role_id');
+    	$this->CI->db->join($userTableName,
+    		$userTableName.'.id='.self::USER_ROLE_TABLE.'.user_id');
+    	$this->CI->db->where(
+    		$userTableName.'.user_id',$userId);
+    	$this->CI->db->where(
+    		self::ROLE_TABLE.'.name',$roleName);
     	$this->CI->db->limit(1);
     	
     	$query = $this->CI->db->get();
@@ -223,7 +259,7 @@ class Acl {
     			$this->CI->db->where('user_id',$userId);
     			$this->CI->db->limit(1);
     			
-    			$query = $this->CI->db->get('dsr2_users');
+    			$query = $this->CI->db->get($userTableName);
     			
     			if ( $query->num_rows() != 1 )
     			{
@@ -236,7 +272,7 @@ class Acl {
     			$this->CI->db->where('name',$roleName);
     			$this->CI->db->limit(1);
     			
-    			$query = $this->CI->db->get('acl_roles');
+    			$query = $this->CI->db->get(self::ROLE_TABLE);
     			
     			if ( $query->num_rows() != 1 )
     			{
