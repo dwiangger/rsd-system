@@ -12,6 +12,10 @@ class Authentication {
 	 */
 	var $CI;
 	/**
+	 * table name
+	 */
+	const USER_TABLE = 'users';
+	/**
 	 * unique key in session
 	 */
 	const SESSIONKEY = 'loginData';
@@ -80,6 +84,13 @@ class Authentication {
     	return $this->_loginData['NumOfTried'];
     }
     /**
+     * Get user table name
+     */
+    public function getUserTableName()
+    {
+    	return self::USER_TABLE;
+    } 
+    /**
      * Get time of last tried
      */
     public function getLastTried()
@@ -123,7 +134,7 @@ class Authentication {
     	 * 	AND `password` = MD5('$md5pwd')
     	 * LIMIT 1 */
     	$query = $this->CI->db->query("SELECT COUNT(*) AS `total`
-    		FROM `dsr2_users` 
+    		FROM `".$this->CI->db->dbprefix(self::USER_TABLE)."` 
     		WHERE `user_id`=? 
     			AND `password`=MD5(?) 
     		LIMIT 1",
