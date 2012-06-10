@@ -1,14 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.5
+-- version 3.3.9
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: May 14, 2012 at 06:54 PM
--- Server version: 5.5.16
--- PHP Version: 5.3.8
+-- Generation Time: Jun 10, 2012 at 06:08 PM
+-- Server version: 5.5.8
+-- PHP Version: 5.3.5
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -17,59 +17,59 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `dsr2db`
+-- Database: `rsddb`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 --
+
+
+
+
+
+
+
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `acl_roles`
---
 
-CREATE TABLE IF NOT EXISTS `acl_roles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `description` text NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
---
--- Dumping data for table `acl_roles`
---
 
-INSERT INTO `acl_roles` (`id`, `name`, `description`) VALUES
-(1, 'role1', '1111 11 1 1 1 11 111  1  1 1'),
-(2, 'role2', '111222 1 1 1 11 111  1  1 1'),
-(3, 'role3', 'three 3333');
 
--- --------------------------------------------------------
 
---
--- Table structure for table `acl_role_user`
---
 
-CREATE TABLE IF NOT EXISTS `acl_role_user` (
-  `role_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `permission` tinyint(4) NOT NULL DEFAULT '0',
-  UNIQUE KEY `role_id` (`role_id`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `acl_role_user`
---
 
-INSERT INTO `acl_role_user` (`role_id`, `user_id`, `permission`) VALUES
-(1, 1, 1),
-(1, 2, 0),
-(1, 3, 1),
-(2, 1, 0),
-(2, 3, 1);
 
--- --------------------------------------------------------
 
---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- Table structure for table `dsr2_projects`
 --
 
@@ -140,29 +140,29 @@ INSERT INTO `dsr2_team_user` (`team_id`, `user_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `dsr2_users`
---
 
-CREATE TABLE IF NOT EXISTS `dsr2_users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` varchar(255) NOT NULL,
-  `password` char(45) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
---
--- Dumping data for table `dsr2_users`
---
 
-INSERT INTO `dsr2_users` (`id`, `user_id`, `password`) VALUES
-(1, 'gcs_an', 'c0e855b9be0718123e680f4c032fc038'),
-(2, 'gcs_ha', 'c0e855b9be0718123e680f4c032fc038'),
-(3, 'gcs_thanhm', 'c0e855b9be0718123e680f4c032fc038'),
-(4, 'admin', 'c0e855b9be0718123e680f4c032fc038');
 
--- --------------------------------------------------------
 
---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- Table structure for table `dsr2_user_info`
 --
 
@@ -179,6 +179,78 @@ CREATE TABLE IF NOT EXISTS `dsr2_user_info` (
   `mobile` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+--
+-- Dumping data for table `dsr2_user_info`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rsd_acl_roles`
+--
+
+CREATE TABLE IF NOT EXISTS `rsd_acl_roles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `rsd_acl_roles`
+--
+
+INSERT INTO `rsd_acl_roles` (`id`, `name`, `description`) VALUES
+(1, 'role1', '1111 11 1 1 1 11 111  1  1 1'),
+(2, 'role2', '111222 1 1 1 11 111  1  1 1'),
+(3, 'role3', 'three 3333');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rsd_acl_role_user`
+--
+
+CREATE TABLE IF NOT EXISTS `rsd_acl_role_user` (
+  `role_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `permission` tinyint(4) NOT NULL DEFAULT '0',
+  UNIQUE KEY `role_id` (`role_id`,`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `rsd_acl_role_user`
+--
+
+INSERT INTO `rsd_acl_role_user` (`role_id`, `user_id`, `permission`) VALUES
+(1, 1, 0),
+(1, 2, 0),
+(1, 3, 1),
+(2, 1, 0),
+(2, 3, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rsd_users`
+--
+
+CREATE TABLE IF NOT EXISTS `rsd_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) NOT NULL,
+  `password` char(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+
+--
+-- Dumping data for table `rsd_users`
+--
+
+INSERT INTO `rsd_users` (`id`, `user_id`, `password`) VALUES
+(1, 'gcs_an', 'c0e855b9be0718123e680f4c032fc038'),
+(2, 'gcs_ha', 'c0e855b9be0718123e680f4c032fc038'),
+(3, 'gcs_thanhm', 'c0e855b9be0718123e680f4c032fc038'),
+(4, 'admin', 'c0e855b9be0718123e680f4c032fc038');
+
