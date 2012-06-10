@@ -199,7 +199,7 @@ class Acl {
 	 */
 	public function updateUserRole($userId, $roleName, $permission = 1)
 	{
-		$userTableName = $this->CI->authentication->getUserTableName(); 
+		$userTableName = $this->CI->authentication->getUserTableName();
 		$fullUserTableName = $this->CI->db->dbprefix($userTableName);
 		$fullRoleUserTableName = 
 			$this->CI->db->dbprefix(self::USER_ROLE_TABLE);
@@ -302,12 +302,18 @@ class Acl {
 	 */
     public function checkRole($userId, $roleName)
     {
+    	$userTableName = $this->CI->authentication->getUserTableName(); 
+    	
     	$this->CI->db->select('permission');
-    	$this->CI->db->from('acl_role_user');
-    	$this->CI->db->join('acl_roles','acl_roles.id=acl_role_user.role_id');
-    	$this->CI->db->join('dsr2_users','dsr2_users.id=acl_role_user.user_id');
-    	$this->CI->db->where('dsr2_users.user_id',$userId);
-    	$this->CI->db->where('acl_roles.name',$roleName);
+		$this->CI->db->from(self::USER_ROLE_TABLE);
+    	$this->CI->db->join(self::ROLE_TABLE,
+    		self::ROLE_TABLE.'.id='.self::USER_ROLE_TABLE.'.role_id');
+    	$this->CI->db->join($userTableName,
+    		$userTableName.'.id='.self::USER_ROLE_TABLE.'.user_id');
+    	$this->CI->db->where(
+    		$userTableName.'.user_id',$userId);
+    	$this->CI->db->where(
+    		self::ROLE_TABLE.'.name',$roleName);
     	$this->CI->db->limit(1);
     	
     	$query = $this->CI->db->get();
@@ -332,6 +338,9 @@ class Acl {
      */
     public function getUserByRoles($roles, $getAny = TRUE)
     {
+    	$userTableName = $this->CI->authentication->getUserTableName(); 
+    	$fullUserTableName = $this->CI->db->dbprefix($userTableName);
+    	
     	/* Handle role list */
     	if (!is_array($roles))
     	{
@@ -341,12 +350,16 @@ class Acl {
     		$roles[$i] = (string)$roles[$i];
     	}
     	/* Build query */
-    	$this->CI->db->select('dsr2_users.id AS id,dsr2_users.user_id AS user_id');
-    	$this->CI->db->from('acl_role_user');
-    	$this->CI->db->join('acl_roles','acl_roles.id=acl_role_user.role_id');
-    	$this->CI->db->join('dsr2_users','dsr2_users.id=acl_role_user.user_id');
+    	$this->CI->db->select($fullUserTableName.'.id AS id, '
+    		 .$fullUserTableName.'.user_id AS user_id');
+    	
+    	$this->CI->db->from(self::USER_ROLE_TABLE);
+    	$this->CI->db->join(self::ROLE_TABLE,
+    		self::ROLE_TABLE.'.id='.self::USER_ROLE_TABLE.'.role_id');
+    	$this->CI->db->join($userTableName,
+    		$userTableName.'.id='.self::USER_ROLE_TABLE.'.user_id');
     	$this->CI->db->where('permission',1);
-    	$this->CI->db->where_in('acl_roles.name',$roles);
+    	$this->CI->db->where_in(self::ROLE_TABLE.'.name',$roles);
 		if (!$getAny)
 		{
 			$this->CI->db->group_by(array('id','user_id'));
