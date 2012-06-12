@@ -2,10 +2,16 @@
 	if (isset($userInfo))
 	{
 ?>
-<h1><?php echo $userInfo['first_name'],' ',$userInfo['last_name']; ?>'s info :</h1>
+<h1><?php echo $userInfo->first_name,' ',$userInfo->last_name; ?>'s info :</h1>
 
 <div id="body">
-	All public/private user info
+	<?php 
+		foreach ($userInfo as $propName => $propValue) {
+			?>
+			<div><?= $propName ?>:<?= $propValue ?></div>
+			<?php 
+		}
+	?>
 </div>
 
 <?php 
