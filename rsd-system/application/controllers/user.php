@@ -23,14 +23,18 @@ class User extends CI_Controller {
 		{
 			show_404($this->uri->uri_string(),FALSE);
 		}
-		$data['userId'] = $query->row()->user_id;
-				
+		$user = $query->row();
+		$data['userId'] = $user->user_id;
+		
 		/* Get user_info */
-		$this->db->where('id',$user_id);
+		$this->db->where('id',$user->id);
 		$query = $this->db->get('user_info');
 		if ( $query->num_rows() == 1 )
 		{
 			$data['userInfo'] = $query->row();
+		}else 
+		{
+			$data['userInfo'] = array();
 		}
 		
 		$this->template->write_view('_content','user_view',$data);
