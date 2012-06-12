@@ -12,10 +12,10 @@ class Team extends CI_Controller {
 	{
 		$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 		
-		$query = 
-			$this
-				->db
-				->query('SELECT * FROM `dsr2_teams` WHERE `id`=? LIMIT 1',array($teamId));
+		$this->db->where('id',$teamId);
+		$this->db->limit(1);
+		$query = $this->db
+				->get('teams');
 		if ( $query->num_rows() != 1 )
 		{
 			show_404($this->uri->uri_string(),FALSE);
@@ -27,13 +27,15 @@ class Team extends CI_Controller {
 		$data['team']['description'] = $team->description;	
 		$query->free_result();
 		
-		$query = 
-			$this
-				->db
-				->query('SELECT `dsr2_users`.`user_id`,`dsr2_users`.`id` 
-					FROM `dsr2_users`,`dsr2_team_user` 
-					WHERE `dsr2_users`.`id`=`dsr2_team_user`.`user_id` 
-						AND `dsr2_team_user`.`team_id`=?',array($teamId));
+		$this->db->from('users');
+		$this->db->select($this->db->dbprefix('users').'.user_id, '
+			.$this->db->dbprefix('users').'.id');
+		$this->db->join('team_user',
+			$this->db->dbprefix('users').'.id='
+			.$this->db->dbprefix('team_user').'.user_id');
+		$this->db->where('team_user.team_id',$teamId);
+		$query = $this->db->get();
+		
 		$data['users'] = Array(); 
 		foreach ($query->result() as $user) {
 			$item = Array();

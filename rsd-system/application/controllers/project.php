@@ -12,10 +12,10 @@ class Project extends CI_Controller {
 	{
 		$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 		
-		$query = 
-			$this
-				->db
-				->query('SELECT * FROM `dsr2_projects` WHERE `id`=? LIMIT 1',array($projectId));
+		$this->db->where('id',$projectId);
+		$this->db->limit(1);
+		$query = $this->db
+			->get('projects');
 		if ( $query->num_rows() != 1 )
 		{
 			show_404($this->uri->uri_string(),FALSE);
@@ -26,10 +26,9 @@ class Project extends CI_Controller {
 		$data['project']['name'] = $project->name;
 		$data['project']['description'] = $project->description;	
 		
-		$query = 
-			$this
-				->db
-				->query('SELECT * FROM `dsr2_teams` WHERE `project_id`=?',$projectId);
+		$this->db->where('project_id',$projectId);
+		$query = $this->db
+			->get('teams');
 		$data['teams'] = Array(); 
 		foreach ($query->result() as $team) {
 			$item = Array();

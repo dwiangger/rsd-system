@@ -22,7 +22,7 @@
 	</a>
 </div>
 <div class="title span-15 ">
-	<div class="name">DSR 2.0 PROJECT TRACKING SYSTEM</div>
+	<div class="name">RSD PROJECT MANAGEMENT SYSTEM</div>
 	<div class="slogan">TS Division - Not just test, build your best !</div>
 </div>
 <div class="user-info span-3 last">
@@ -41,7 +41,7 @@
 	</div>
 	<hr />
 	<div id="footer" class="container">
-<div class="copyright span-12">&copy; 2012. DSR 2.0 system.</div>
+<div class="copyright span-12">&copy; 2012. RSD system.</div>
 <div class="footer-link span-12 last">
 	<a href="#">About</a> - 
 	<a href="#">Help</a> - 

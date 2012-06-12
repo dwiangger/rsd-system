@@ -30,7 +30,7 @@ class Welcome extends CI_Controller {
 		$query = 
 			$this
 				->db
-				->query('SELECT * FROM `dsr2_projects`');
+				->get('projects');
 		$data['projects'] = Array(); 
 		foreach ($query->result() as $project) {
 			$item = Array();
@@ -61,12 +61,7 @@ class Welcome extends CI_Controller {
 		$this->load->library('crud/scrud');
 		$rsl = TRUE;
 		/* Attack */
-		$this->scrud->table('dsr2_users');
-		$this->scrud->displayType('massive');
-		$this->scrud->setColumn('password',array());
-		$this->scrud->setColumn('user_id',array());
-		
-		echo $this->scrud->reader();
+
 		/* Result */
 		if ($rsl)
 		{
