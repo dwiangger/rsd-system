@@ -13,7 +13,13 @@
 	 
 	 <!-- Bootstrap -->
 	 <link rel="stylesheet" href="<?= $this->config->item('base_url') ?>css/bootstrap.css" type="text/css">
-	 
+	 <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+    
 	 <script type="text/javascript" src="<?= $this->config->item('base_url') ?>scripts/jquery.js"></script>
 	 <script type="text/javascript" src="<?= $this->config->item('base_url') ?>scripts/bootstrap.js"></script>
 	<script type="text/javascript" src="<?= $this->config->item('base_url') ?>scripts/jquery-ui.js"></script>
@@ -41,9 +47,21 @@
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="<?= $this->config->item('base_url') ?>index.php/user/index/<?= $userInfo?$userInfo:'#'; ?>">Profile</a></li>
+            <?php 
+            	if($userInfo)
+            	{ 
+            		?>
+              <li><a href="<?= $this->config->item('base_url') ?>index.php/user/index/<?= $userInfo ?>">Profile</a></li>
               <li class="divider"></li>
-              <li><a href="#">Sign Out</a></li>
+              <li><a href="<?= $this->config->item('base_url') ?>index.php/authenticate/logout">Sign Out</a></li>
+            		<?php 
+            	}else
+            	{
+            		?>
+              <li><a href="#">Log in</a></li>            		
+            		<?php 
+            	}
+            	?>
             </ul>
           </div>
           <div class="nav-collapse">
@@ -60,9 +78,15 @@
 
 <!-- container -->
 <div class="container">
-	<div id="navigator">
+	
+	<div class="row">
+		<div class="span6">
+			<div id="navigator">
 <?= $_navigation ?>
+			</div>
+		</div>
 	</div>
+	
 	<div id="main-content">
 <?= $_content ?>
 	</div>
