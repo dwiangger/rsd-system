@@ -1,5 +1,5 @@
-<h1>Team <?php //echo $team['name']; ?></h1>
-<h3><?php //echo $team['description']; ?></h3>
+<h1>Team <?php echo $team['name']; ?></h1>
+<h3><?php echo $team['description']; ?></h3>
 
 <div id="body">
 	<p>All member :</p>
