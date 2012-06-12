@@ -2,8 +2,8 @@
 <head>
 	<title>Project Tracking System</title>
 	<!-- Default js library & css -->
-	<!-- <link rel="stylesheet" href="<?= $this->config->item('base_url') ?>css/style.css" type="text/css">
-	<link rel="stylesheet" href="<?= $this->config->item('base_url') ?>css/jquery-ui.css" type="text/css"> -->
+	<!-- <link rel="stylesheet" href="<?= $this->config->item('base_url') ?>css/style.css" type="text/css"> -->
+	<link rel="stylesheet" href="<?= $this->config->item('base_url') ?>css/jquery-ui.css" type="text/css">
 	
 	<!-- Blueprint -->
 	<!-- 
@@ -32,7 +32,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">RSD system</a>
+          <a class="brand" href="<?= $this->config->item('base_url') ?>">RSD system</a>
           <div class="btn-group pull-right">
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
               <i class="icon-user"></i> <?php
@@ -41,16 +41,16 @@
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="<?= $userInfo?$userInfo:'#'; ?>">Profile</a></li>
+              <li><a href="<?= $this->config->item('base_url') ?>index.php/user/index/<?= $userInfo?$userInfo:'#'; ?>">Profile</a></li>
               <li class="divider"></li>
               <li><a href="#">Sign Out</a></li>
             </ul>
           </div>
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li class="active"><a href="<?= $this->config->item('base_url') ?>">Home</a></li>
+              <!-- <li><a href="#about">About</a></li> -->
+              <!-- <li><a href="#contact">Contact</a></li> -->
             </ul>
           </div><!--/.nav-collapse -->
         </div>
