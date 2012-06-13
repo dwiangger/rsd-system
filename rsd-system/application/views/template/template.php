@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
 	<title>Project Tracking System</title>
 	<!-- Default js library & css -->
@@ -58,7 +59,7 @@
             	}else
             	{
             		?>
-              <li><a href="#">Log in</a></li>            		
+              <li><a href="<?= $this->config->item('base_url') ?>index.php/authenticate/login">Log in</a></li>            		
             		<?php 
             	}
             	?>
@@ -80,25 +81,25 @@
 <div class="container">
 	
 	<div class="row">
-		<div class="span6">
+		<div class="span12">
 			<div id="navigator">
 <?= $_navigation ?>
 			</div>
 		</div>
 	</div>
-	
-	<div id="main-content">
+
 <?= $_content ?>
-	</div>
-	<hr />
-	<div class="footer">
-<div class="copyright">&copy; 2012. RSD system.</div>
-<div class="footer-link">
-	<a href="#">About</a> - 
-	<a href="#">Help</a> - 
-	<a href="mailto:anntvo@gcs-vn.com">Contact</a>
-</div>
-	</div>
 </div> <!-- close:container -->
+
+<div class="footer container">
+	<div class="row">
+		<div class="copyright span6">&copy; 2012. RSD system.</div>
+		<div class="footer-link span6" style="text-align: right;">
+			<a href="#">About</a> - 
+			<a href="#">Help</a> - 
+			<a href="mailto:anntvo@gcs-vn.com">Contact</a>
+		</div>
+	</div>
+</div>
 </body>
 </html>
