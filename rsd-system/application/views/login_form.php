@@ -4,6 +4,7 @@
  * $displayAlert: 	Display or not alerting abot wrong username/password 
  * None of 2 above is set ? go ahead. 
  */
+$displayAlert = isset($displayAlert)?$displayAlert:"TRUE";
 ?>
 <div class="row">
 	<div class="span4 offset4" style="background:url('../../img/lock.png') no-repeat;">
