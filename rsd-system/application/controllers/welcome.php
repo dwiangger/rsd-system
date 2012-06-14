@@ -41,14 +41,27 @@ class Welcome extends CI_Controller {
 			
 			$data['projects'][] = $item;
 		}
+		
 		$this->template->write_view(
 			'_navigation',
 			'template/navigation',
-			array( 'nav' => array(
-				'Home' => array(
-					'All project' => ''
+			array(
+				'nav' => array(
+					array(
+						"name" => "Home", 
+						"link" => "", 
+						"active" => FALSE, 
+						"child" => array() 
+					),
+					array(
+						"name" => "All Project", 
+						"link" => "", 
+						"active" => TRUE, 
+						"child" => array()
+					)
 				)
-			)));		
+			));
+				
 		$this->template->write_view(
 			'_content',
 			'welcome_message',
