@@ -7,9 +7,14 @@
  * 		"link" => "text", 		// link without prefix 
  * 		"active" => TRUE/FALSE, // active or not 
  * 		"child" => array (
- * 			"item" => "text",	// display name
- * 			"link" => "text",	// link wothou prefix
- * 			"active" => TRUE/FALSE	// active or not
+ * 			$child1 => array(
+ * 				"item" => "text",	// display name
+ * 				"link" => "text",	// link without prefix
+ * 				"active" => TRUE/FALSE	// active or not
+ * 			),
+ * 			$child2, 
+ * 			$child3, 
+ * 			...
  * 		) 
  * 	),
  * 	$item2, 
@@ -38,7 +43,7 @@ if ( !isset($nav) )
 		foreach ($nav as $item) {
 			$hasChild = count($item["child"])>0;
 			?>
-			<li class="<?= $item["active"]?"active":"" ?>">
+			<li class="<?= $item["active"]?"active":"" ?><?= $hasChild?" dropdown":"" ?>">
 				<a class="<?= $hasChild?"dropdown-toggle":"" ?>"
 					<?= $hasChild?"data-toggle=\"dropdown\"":"" ?> 
 					href="<?= $this->config->item('base_url').$item["link"] ?>">
@@ -53,10 +58,10 @@ if ( !isset($nav) )
 							<?php 
 								foreach ($item["child"] as $child) {
 									?>
-					<li class="<?= $item["active"]?"active":"" ?>">
+					<li class="<?= $child["active"]?"active":"" ?>">
 						<a class="<?= $child["active"]?"active":"" ?>"
 							href="<?= $this->config->item('base_url').$child["link"] ?>">
-							<?= $item["name"] ?>
+							<?= $child["name"] ?>
 						</a>
 					</li>
 									<?php 
