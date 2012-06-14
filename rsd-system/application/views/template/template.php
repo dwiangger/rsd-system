@@ -22,6 +22,7 @@
     </style>
     
 	 <script type="text/javascript" src="<?= $this->config->item('base_url') ?>scripts/jquery.js"></script>
+	 <script type="text/javascript" src="<?= $this->config->item('base_url') ?>scripts/jquery.countdown.min.js"></script>
 	 <script type="text/javascript" src="<?= $this->config->item('base_url') ?>scripts/bootstrap.js"></script>
 	<script type="text/javascript" src="<?= $this->config->item('base_url') ?>scripts/jquery-ui.js"></script>
 	<!-- custom js & css -->
