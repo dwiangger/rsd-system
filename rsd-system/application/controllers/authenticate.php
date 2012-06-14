@@ -47,35 +47,25 @@ class Authenticate extends CI_Controller {
 				$password) )
 				{
 					redirect('welcome');
+				}else
+				{
+					$data['displayAlert'] = TRUE;
 				}
-		}else
-		{
-			/* default */
 		}
 		$data['numOfFailed'] = $this
 			->authentication
 			->getNumOfFailed(); 
 		if ( $data['numOfFailed'] > 0 )
 		{
-			$data['displayAlert'] = TRUE;
 			$delay = strtotime("now") - 
 				$this->authentication->getLastTried();
 			if ( $data['numOfFailed'] >= $this->authentication->getMaxNumOfTried() 
 				&& $delay <= $data['numOfFailed']*60 )
 				{
-					$data['displayForm'] = FALSE;
 					$data['delay'] = $delay;
-				}else
-				{
-					$data['displayForm'] = TRUE;
 				}
-		}else 
-		{
-			$data['displayForm'] = TRUE;
-			$data['displayAlert'] = FALSE;
 		}
 			
-		// $this->load->view('login_form',$data);
 		/* Use template library instead */
 		$this->template->write_view(
 			'_content', 
