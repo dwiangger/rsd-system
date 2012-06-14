@@ -26,6 +26,8 @@ class Project extends CI_Controller {
 		$data['project']['name'] = $project->name;
 		$data['project']['description'] = $project->description;	
 		
+		$teamMenu = array();
+		
 		$this->db->where('project_id',$projectId);
 		$query = $this->db
 			->get('teams');
@@ -39,15 +41,43 @@ class Project extends CI_Controller {
 			
 			$data['teams'][] = $item;
 		}
+		/* get all project and add to menu */
+		$projectMenu = array();
+		$query = $this->db
+			->get('projects');
+		$data['projects'] = Array(); 
+		foreach ($query->result() as $project) {
+			$projectMenu[] = array(
+				"name" => $project->name,
+				"link" => "index.php/project/index/".$project->id,
+				"active" => FALSE
+			);
+		}
 		$this->template->write_view(
 			'_navigation',
 			'template/navigation',
-			array( 'nav' => array(
-				'Home' => array(
-					'All project' => '',
-					$project->name => 'index.php/project/index/'.$project->id
+			array(
+				'nav' => array(
+					array(
+						"name" => "Home", 
+						"link" => "", 
+						"active" => FALSE, 
+						"child" => array() 
+					),
+					array(
+						"name" => "All projects", 
+						"link" => "", 
+						"active" => FALSE, 
+						"child" => $projectMenu /* get all projects as menu here */
+					),
+					array(
+						"name" => "Teams", 
+						"link" => "", 
+						"active" => TRUE, 
+						"child" => array()
+					)
 				)
-			)));
+			));
 		$this->template->write_view(
 			'_content','project_view',$data);
 		$this->template->render();
