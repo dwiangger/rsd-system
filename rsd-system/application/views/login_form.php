@@ -46,9 +46,22 @@ $displayAlert = isset($displayAlert)?$displayAlert:FALSE;
 			<div class="row">
 				<div class="span3 offset1" style="text-align:right;">
 					<div class="small-attention">You are logged failed <?php echo $numOfFailed; ?> time(s).</div>
-					<div class="small-attention">Please try again after <?php echo date("i:s",$numOfFailed*60-$delay); ?>s.</div>
+					<div class="small-attention">Please try again after <span id="delay-time"></span>s.</div>
 				</div>
 			</div>
+			<script type="text/javascript">
+				$('#delay-time').countdown({
+					until: +<?= $numOfFailed*60-$delay ?>,
+					compact: true,
+					format: "MS",
+					description: "", 
+					alwaysExpire: true,
+					onExpiry: function () 
+					{
+						location.reload(true);
+					} 
+				});
+			</script>
 		<?php 
 	}else
 	{
