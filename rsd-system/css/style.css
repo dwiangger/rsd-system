@@ -1,40 +1,12 @@
 @CHARSET "ISO-8859-1";
 
-/* CSS style for Header */ 
-#header div.user-info
+.attention 
 {
-	text-align: right;
+	color: #b94a48;
 }
 
-#header div.title
+.small-attention
 {
-	padding-top: 20px;
-	color: #3b5998;
-}
-#header div.title .name
-{
-	font-weight: bold;
-	font-size: 160%;
-}
-#header div.title .slogan
-{
-	font-weight: bold;
-	font-style: italic;
-	font-size: 110%;
-}
-
-#header div.user-info
-{
-	padding-top: 20px;
-}
-/* CSS style for Navigator */
-#navigator 
-{
-	/* height: 30px; */
-	margin: auto;
-}
-/* CSS style for Footer */ 
-#footer div.footer-link
-{
-	text-align: right;
+	color: #b94a48;
+	font-size: 92%;
 }

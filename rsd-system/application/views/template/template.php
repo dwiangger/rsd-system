@@ -3,7 +3,7 @@
 <head>
 	<title>Project Tracking System</title>
 	<!-- Default js library & css -->
-	<!-- <link rel="stylesheet" href="<?= $this->config->item('base_url') ?>css/style.css" type="text/css"> -->
+	<link rel="stylesheet" href="<?= $this->config->item('base_url') ?>css/style.css" type="text/css">
 	<link rel="stylesheet" href="<?= $this->config->item('base_url') ?>css/jquery-ui.css" type="text/css">
 	
 	<!-- Blueprint -->
