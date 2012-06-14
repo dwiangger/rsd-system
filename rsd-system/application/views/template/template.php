@@ -66,13 +66,7 @@
             	?>
             </ul>
           </div>
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="active"><a href="<?= $this->config->item('base_url') ?>">Home</a></li>
-              <!-- <li><a href="#about">About</a></li> -->
-              <!-- <li><a href="#contact">Contact</a></li> -->
-            </ul>
-          </div><!--/.nav-collapse -->
+<?= $_navigation ?>
         </div>
       </div>
     </div>
@@ -80,15 +74,6 @@
 
 <!-- container -->
 <div class="container">
-	
-	<div class="row">
-		<div class="span12">
-			<div id="navigator">
-<?= $_navigation ?>
-			</div>
-		</div>
-	</div>
-
 <?= $_content ?>
 </div> <!-- close:container -->
 
