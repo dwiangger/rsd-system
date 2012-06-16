@@ -69,14 +69,16 @@ class Welcome extends CI_Controller {
 		$this->template->render();
 	}
 	
-	public function test()
+	public function test($page=0)
 	{
 		$this->load->library('crudlib/crud');
 		$rsl = TRUE;
+		
 		/* Attack */
 		$this->crud->TableName("projects");
+		$this->crud->Option("indexColumn",TRUE);
 		$this->crud->PageSize(10);
-		$this->crud->FirstItemIndex(15);
+		$this->crud->FirstItemIndex($page*10);
 		$this->crud->ColumnDefine(array(
 			'id' => array('display' => FALSE),
 			'name' => array(
@@ -88,15 +90,16 @@ class Welcome extends CI_Controller {
 				'header' => "Description"
 			)
 		));
-		echo $this->crud->render_list();
+		$data = $this->crud->render_list();
+		
 		/* Result */
-		if ($rsl)
-		{
-			echo 'Things are OK.';
-		}else
-		{
-			echo 'Adding failed';
-		}
+		$this->template->write_view(
+			'_navigation',
+			'template/navigation',array());
+		$this->template->write(
+			'_content',
+			$data);
+		$this->template->render();
 	}
 }
 

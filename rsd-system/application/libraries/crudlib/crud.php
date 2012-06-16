@@ -42,7 +42,19 @@ class CRUD {
 	 */
 	private function print_html($data)
 	{
+		$indexColumn = FALSE;
+		if ( isset($this->_options['indexColumn']) && $this->_options['indexColumn'])
+		{
+			$indexColumn = TRUE;	
+		}
 		$result = "\n<table>\n\t<tr>\n";
+		
+		$i = $this->_firstItemIndex;
+		if ($indexColumn)
+		{
+			$result .= "\t\t<th>#</th>\n";
+		}
+		
 		foreach ($this->_definitions as $colName => $colDefine) {
 			if ( ! $colDefine['display'] )
 			{
@@ -58,6 +70,10 @@ class CRUD {
 		$result .= "\t</tr>\n";
 		foreach ($data as $row) {
 			$result .= "\t<tr>\n";
+			if ($indexColumn)
+			{
+				$result .= "\t\t<td>".(++$i)."</td>\n";
+			}
 			foreach ($this->_definitions as $colName => $colDefine) {
 				if ( $colDefine['display'] )
 				{
@@ -108,6 +124,15 @@ class CRUD {
 			$this->_definitions = $columnDefine;
 		}
 		return $this->_definitions;
+	}
+	
+	public function Option($name,$value = NULL)
+	{
+		if ($value != NULL)
+		{
+			$this->_options[$name] = (string)$value;
+		}
+		return $this->_options[$name];
 	}
 	
 	/**
