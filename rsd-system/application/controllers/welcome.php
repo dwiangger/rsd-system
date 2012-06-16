@@ -75,7 +75,7 @@ class Welcome extends CI_Controller {
 		$rsl = TRUE;
 		
 		/* Attack */
-		$this->crud->TableName("projects");
+		$this->crud->TableName("teams");
 		$this->crud->Option("indexColumn",TRUE);
 		$this->crud->PageSize(10);
 		$this->crud->FirstItemIndex($page*10);
@@ -88,6 +88,22 @@ class Welcome extends CI_Controller {
 			'description' => array(
 				'display' => TRUE,
 				'header' => "Description"
+			),
+			'project_id' => array(
+				'display' => TRUE,
+				'header' => "Project",
+				'ref' => array(
+					'firstChain' => 'projects',
+					'lastChain' => 'projects',
+					'displayCol' => 'name',
+					'chain' => array(
+						'projects' => array(
+							'indexCol' => 'id',
+							'refCol' => '',
+							'nextChain' => ''
+						)
+					)
+				)
 			)
 		));
 		$data = $this->crud->render_list();
@@ -100,6 +116,7 @@ class Welcome extends CI_Controller {
 			'_content',
 			$data);
 		$this->template->render();
+		/* End of examle */ 
 	}
 }
 

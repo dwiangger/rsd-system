@@ -140,16 +140,61 @@ class CRUD {
 	 */
 	public function render_list($type = "html")
 	{
-		$query = $this->CI->db->limit($this->_pageSize,$this->_firstItemIndex);
+		$this->CI->db->limit($this->_pageSize,$this->_firstItemIndex);
+		$this->CI->db->from($this->_tableName);
+		
+		$i = 0;
+		$selectList = array($this->_tableName.".*");
+		foreach ($this->_definitions as $colName => $colDefine) {
+			if (isset($colDefine['ref']) 
+				&& count($colDefine['ref']) > 0 ) {
+				/* join and add to select list */
+					$displayCol = $colDefine['ref']['displayCol'];
+					
+					$chains = $colDefine['ref']['chain'];
+					
+					$prevTable = $this->_tableName;
+					$prevCol = $colName;
+					$currChain = $colDefine['ref']['firstChain']; 
+					
+					while(TRUE)
+					{
+						$chain = $chains[$currChain];
+						$indexCol = $chain['indexCol'];
+						
+						/* Join */
+						$this->CI->db->join("$currChain AS $currChain$i",
+							"$prevTable.$prevCol=$currChain$i.$indexCol");
+						
+						/* Checking last chain */
+						if ( $currChain == $colDefine['ref']['lastChain'] )
+						{
+							/* Add to selecting list */
+							array_push($selectList,"$currChain$i.$displayCol AS $colName");
+							
+							break;
+						}
+						
+						/* prepare for next loop */
+						$prevTable = $currChain.$i;
+						$prevCol = $chain['refCol'];
+						$currChain = $chain['nextChain'];
+					}
+					
+					$i++;
+			}
+		}
+		
+		$query = $this->CI->db->select(implode(",", $selectList));
 		$query = $this->CI->db
-			->get($this->_tableName);
+			->get();
 		$result = array();
 		foreach ($query->result() as $row) {
 			$item = array();
-			foreach ($this->_definitions as $columnName => $columnDefine) {
-				if ( $columnDefine["display"] )
+			foreach ($this->_definitions as $colName => $colDefine) {
+				if ( $colDefine["display"] )
 				{
-					$item[$columnName] = $row->$columnName;
+					$item[$colName] = $row->$colName;
 				}
 			}
 			array_push($result,$item);
