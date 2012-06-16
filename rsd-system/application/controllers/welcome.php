@@ -71,10 +71,24 @@ class Welcome extends CI_Controller {
 	
 	public function test()
 	{
-		$this->load->library('crud/scrud');
+		$this->load->library('crudlib/crud');
 		$rsl = TRUE;
 		/* Attack */
-
+		$this->crud->TableName("projects");
+		$this->crud->PageSize(10);
+		$this->crud->FirstItemIndex(15);
+		$this->crud->ColumnDefine(array(
+			'id' => array('display' => FALSE),
+			'name' => array(
+				'display' => TRUE, 
+				'header' => "Name"
+			),
+			'description' => array(
+				'display' => TRUE,
+				'header' => "Description"
+			)
+		));
+		echo $this->crud->render_list();
 		/* Result */
 		if ($rsl)
 		{

@@ -19,8 +19,117 @@ class CRUD {
 		log_message('debug', "crudlib/CRUD Class Initialized");
 	}
 	/**
+	 * Local variable 
+	 */
+	/**
 	 * @var instance of CI
 	 */
 	var $CI;
-   
+	/**
+	 * General variable
+	 */
+	var $_tableName;
+	var $_options; 
+	var $_definitions;
+	/**
+	 * Variable for viewing list. 
+	 */
+	var $_query;
+	var $_pageSize;
+	var $_firstItemIndex;
+	/**
+	 * Local method 
+	 */
+	private function print_html($data)
+	{
+		$result = "\n<table>\n\t<tr>\n";
+		foreach ($this->_definitions as $colName => $colDefine) {
+			if ( ! $colDefine['display'] )
+			{
+				continue;
+			}
+			$header = $colName;
+			if(isset($colDefine['header']))
+			{
+				$header = $colDefine['header']; 
+			}
+			$result .= "\t\t<th>".$header."</th>\n";
+		}
+		$result .= "\t</tr>\n";
+		foreach ($data as $row) {
+			$result .= "\t<tr>\n";
+			foreach ($this->_definitions as $colName => $colDefine) {
+				if ( $colDefine['display'] )
+				{
+					$result .= "\t\t<td>".$row[$colName]."</td>\n";
+				}
+			}
+			$result .= "\t</tr>\n";
+		}
+		$result .= "</table>\n";
+		return $result;
+	}
+	/**
+	 * Public method
+	 */
+	/**
+	 * Get/set table name 
+	 */
+	public function TableName($tableName = NULL)
+	{
+		if ($tableName != NULL)
+		{
+			$this->_tableName = (string)$tableName;
+		}
+		return $this->_tableName;
+	}
+	
+	public function PageSize($pageSize = NULL)
+	{
+		if ($pageSize != NULL)
+		{
+			$this->_pageSize = (int)$pageSize; 
+		}
+		return $this->_pageSize;
+	}
+	
+	public function FirstItemIndex($firstItemIndex = NULL)
+	{
+		if ($firstItemIndex != NULL)
+		{
+			$this->_firstItemIndex = (int)$firstItemIndex;
+		}
+		return $this->_firstItemIndex;
+	}
+
+	public function ColumnDefine($columnDefine = NULL)
+	{
+		if ($columnDefine != NULL) {
+			$this->_definitions = $columnDefine;
+		}
+		return $this->_definitions;
+	}
+	
+	/**
+	 * Render list view to a string as a specific $type   
+	 */
+	public function render_list($type = "html")
+	{
+		$query = $this->CI->db->limit($this->_pageSize,$this->_firstItemIndex);
+		$query = $this->CI->db
+			->get($this->_tableName);
+		$result = array();
+		foreach ($query->result() as $row) {
+			$item = array();
+			foreach ($this->_definitions as $columnName => $columnDefine) {
+				if ( $columnDefine["display"] )
+				{
+					$item[$columnName] = $row->$columnName;
+				}
+			}
+			array_push($result,$item);
+		}
+		
+		return self::print_html($result);
+	}
 }
