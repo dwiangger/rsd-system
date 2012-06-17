@@ -36,25 +36,26 @@ class CRUD {
 	 */
 	var $_query;
 	var $_pageSize;
-	var $_firstItemIndex;
+	var $_pageIndex;
+	var $_totalResults;
 	/**
 	 * Local method 
 	 */
 	private function print_html($data)
 	{
 		$indexColumn = FALSE;
+		$numRow = 0;
+		/* Init table */
+		$result = "\n<table>\n\t<tr>\n";
+		/* Checking for index column displaying */
 		if ( isset($this->_options['indexColumn']) && $this->_options['indexColumn'])
 		{
-			$indexColumn = TRUE;	
+			$indexColumn = TRUE;
+			$numRow++;	// For index column
+			$result .= "\t\t<th>#</th>\n"; // Header of ind 
 		}
-		$result = "\n<table>\n\t<tr>\n";
-		
-		$i = $this->_firstItemIndex;
-		if ($indexColumn)
-		{
-			$result .= "\t\t<th>#</th>\n";
-		}
-		
+
+		/* Display all column header which set to display */
 		foreach ($this->_definitions as $colName => $colDefine) {
 			if ( ! $colDefine['display'] )
 			{
@@ -66,14 +67,21 @@ class CRUD {
 				$header = $colDefine['header']; 
 			}
 			$result .= "\t\t<th>".$header."</th>\n";
+			$numRow++;// Calculate num rows 
 		}
 		$result .= "\t</tr>\n";
+		
+		/* Display index from first item's index */
+		$i = $this->_pageIndex*$this->_pageSize;
+		/* Ddisplay each row */
 		foreach ($data as $row) {
 			$result .= "\t<tr>\n";
+			/* Index row */
 			if ($indexColumn)
 			{
 				$result .= "\t\t<td>".(++$i)."</td>\n";
 			}
+			/* data rows */
 			foreach ($this->_definitions as $colName => $colDefine) {
 				if ( $colDefine['display'] )
 				{
@@ -82,7 +90,42 @@ class CRUD {
 			}
 			$result .= "\t</tr>\n";
 		}
-		$result .= "</table>\n";
+		
+		/* Calculate and Generate navigation link */
+		$navLink = $this->_options["navLink"];
+		$result .= "\t<tr><td colspan=\"$numRow\">";
+		/* Previous link */
+		if ($this->_pageIndex > 0) {
+			$result .= "<a href=\"".str_replace("{page-index}", "", $navLink)."\" title=\"First page\" class=\"btn btn-mini\">"
+					."<i class=\"icon-fast-backward\"></i></a>";
+			$result .= "<a href=\"".str_replace("{page-index}", ($this->_pageIndex-1), $navLink)."\" title=\"Previous page\" class=\"btn btn-mini\">"
+					."<i class=\"icon-step-backward\"></i></a>";
+		}else 
+		{
+			$result .= "<a href=\"#\" title=\"First page\" class=\"btn btn-mini disabled\">"
+					."<i class=\"icon-fast-backward\"></i></a>";
+			$result .= "<a href=\"#\" title=\"Previous page\" class=\"btn btn-mini disabled\">"
+					."<i class=\"icon-step-backward\"></i></a>";
+		}
+		/* Display page, total ... */
+		$totalPage = (int)($this->_totalResults/$this->_pageSize);
+		$result .= "<span>Page ".$this->_pageIndex."/".$totalPage." totals ".$this->_totalResults." result(s)</span>";
+		/* Next link */
+		if ( $this->_pageIndex >= $totalPage )
+		{
+			$result .= "<a href=\"#\" title=\"Next page\" class=\"btn btn-mini disabled\">"
+					."<i class=\"icon-step-forward\"></i></a>"
+				."<a href=\"#\" title=\"Last page\" class=\"btn btn-mini disabled\">"
+					."<i class=\"icon-fast-forward\"></i></a>";
+		}else
+		{
+			$result .= "<a href=\"".str_replace("{page-index}", $this->_pageIndex+1, $navLink)."\" title=\"Next page\" class=\"btn btn-mini\">"
+					."<i class=\"icon-step-forward\"></i></a>"
+				."<a href=\"".str_replace("{page-index}", $totalPage, $navLink)."\" title=\"Last page\" class=\"btn btn-mini\">"
+					."<i class=\"icon-fast-forward\"></i></a>";
+		}
+		$result .= "</td></tr>\n"
+			."</table>\n";
 		return $result;
 	}
 	/**
@@ -109,13 +152,13 @@ class CRUD {
 		return $this->_pageSize;
 	}
 	
-	public function FirstItemIndex($firstItemIndex = NULL)
+	public function PageIndex($pageIndex = NULL)
 	{
-		if ($firstItemIndex != NULL)
+		if ($pageIndex != NULL)
 		{
-			$this->_firstItemIndex = (int)$firstItemIndex;
+			$this->_pageIndex = (int)$pageIndex;
 		}
-		return $this->_firstItemIndex;
+		return $this->_pageIndex;
 	}
 
 	public function ColumnDefine($columnDefine = NULL)
@@ -140,7 +183,11 @@ class CRUD {
 	 */
 	public function render_list($type = "html")
 	{
-		$this->CI->db->limit($this->_pageSize,$this->_firstItemIndex);
+		/* Cache setup for 2 query 
+		 * 1. get count of all results. 
+		 * 2. get page of results.
+		 */
+		$this->CI->db->start_cache();
 		$this->CI->db->from($this->_tableName);
 		
 		$i = 0;
@@ -184,7 +231,13 @@ class CRUD {
 					$i++;
 			}
 		}
+		$this->CI->db->stop_cache();
 		
+		/* Get count of all result */
+		$this->_totalResults = $this->CI->db->count_all_results();
+		
+		/* Get specific page */
+		$this->CI->db->limit($this->_pageSize,$this->_pageIndex*$this->_pageSize);
 		$query = $this->CI->db->select(implode(",", $selectList));
 		$query = $this->CI->db
 			->get();

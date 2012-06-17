@@ -75,10 +75,11 @@ class Welcome extends CI_Controller {
 		$rsl = TRUE;
 		
 		/* Attack */
-		$this->crud->TableName("teams");
+		$this->crud->TableName("projects");
 		$this->crud->Option("indexColumn",TRUE);
+		$this->crud->Option("navLink",$this->config->item('base_url')."index.php/welcome/test/{page-index}");
 		$this->crud->PageSize(10);
-		$this->crud->FirstItemIndex($page*10);
+		$this->crud->PageIndex($page);
 		$this->crud->ColumnDefine(array(
 			'id' => array('display' => FALSE),
 			'name' => array(
@@ -88,7 +89,7 @@ class Welcome extends CI_Controller {
 			'description' => array(
 				'display' => TRUE,
 				'header' => "Description"
-			),
+			)/*,
 			'project_id' => array(
 				'display' => TRUE,
 				'header' => "Project",
@@ -104,8 +105,9 @@ class Welcome extends CI_Controller {
 						)
 					)
 				)
-			)
+			)*/
 		));
+		
 		$data = $this->crud->render_list();
 		
 		/* Result */
