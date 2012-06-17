@@ -50,6 +50,10 @@ class CRUD {
 	var $_pageIndex; /* count from 1 */
 	var $_totalResults;
 	/**
+	 * Variable for detail
+	 */
+	var $_itemId;
+	/**
 	 * Local method 
 	 */
 	private function print_html($data)
@@ -234,6 +238,14 @@ class CRUD {
 		return $this->_options[$name];
 	}
 	
+	public function ItemId($itemId = NULL)
+	{
+		if ($itemId != NULL)
+		{
+			$this->_itemId = (int)$itemId;
+		}
+		return $this->_itemId;
+	}
 	/**
 	 * Render list view to a string as a specific $type   
 	 */
@@ -312,5 +324,13 @@ class CRUD {
 		}
 		
 		return self::print_html($result);
+	}
+	/**
+	 * Render detail view to a string 
+	 */
+	
+	public function render_detail()
+	{
+		
 	}
 }
