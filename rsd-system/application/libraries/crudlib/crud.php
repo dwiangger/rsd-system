@@ -190,16 +190,20 @@ class CRUD {
 	
 	private function print_detail_html($data)
 	{
-		$result = "<table>\n";
+		$result = "<form class=\"form-horizontal\">\n<fieldset>\n";
 		foreach ($this->_definitions as $colName => $colDefine) {
 			if( $colDefine['display'] )
 			{
-				$result .= "\t<tr><td>".$colDefine['header']."</td>"
-					."<td>".$data[$colName]."</td></tr>\n";
+				$result .= "\t<div class=\"control-group\">\n"
+					."\t\t<label class=\"control-label\">".$colDefine['header']."</label>\n"
+					."\t\t<div class=\"controls\"><input type=\"text\" class=\"input-xlarge\" value=\"".$data[$colName]."\" readonly=\"readonly\"/></div>\n"
+					."\t</div>\n";
 			}
 		}
 		
-		$result .= "</table>\n";
+		$result .= "<a class=\"btn btn-info\" href=\"#\"><i class=\"icon-pencil icon-white\"></i> Edit</a>\n"
+        	."<a class=\"btn btn-danger\" href=\"#\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n" 
+			."</fieldset>\n</form>\n";
 		
 		return $result;
 	}
