@@ -75,18 +75,12 @@ class Welcome extends CI_Controller {
 		$rsl = TRUE;
 		
 		/* Attack */
-		$this->crud->TableName("projects");
-		$this->crud->Option("indexColumn",TRUE);
-		$this->crud->Option("navLink",
-			$this->config->item('base_url')."index.php/welcome/test/{page-index}");
-		//$this->crud->Option("editLink",
-		//	$this->config->item('base_url')."index.php/welcome/edit/{item-index}");
-		$this->crud->Option("confirmDeleteLink",
-			$this->config->item('base_url')."index.php/welcome/delete/{item-index}");
-		$this->crud->PageSize(10);
-		$this->crud->PageIndex($page);
+		$this->crud->TableName("teams");
 		$this->crud->ColumnDefine(array(
-			'id' => array('display' => FALSE),
+			'id' => array(
+				'display' => FALSE,
+				'primary' => TRUE
+			),
 			'name' => array(
 				'display' => TRUE, 
 				'header' => "Name"
@@ -94,7 +88,7 @@ class Welcome extends CI_Controller {
 			'description' => array(
 				'display' => TRUE,
 				'header' => "Description"
-			)/*,
+			),
 			'project_id' => array(
 				'display' => TRUE,
 				'header' => "Project",
@@ -110,10 +104,23 @@ class Welcome extends CI_Controller {
 						)
 					)
 				)
-			)*/
+			)
 		));
+		/* list */
+		$this->crud->Option("indexColumn",TRUE);
+		$this->crud->Option("navLink",
+			$this->config->item('base_url')."index.php/welcome/test/{page-index}");
+		//$this->crud->Option("editLink",
+		//	$this->config->item('base_url')."index.php/welcome/edit/{item-index}");
+		$this->crud->Option("confirmDeleteLink",
+			$this->config->item('base_url')."index.php/welcome/delete/{item-index}");
+		$this->crud->PageSize(10);
+		$this->crud->PageIndex($page);
+		/* detail */
+		$this->crud->ItemId(1);
 		
-		$data = $this->crud->render_list();
+		
+		$data = $this->crud->render_detail();
 		
 		/* Result */
 		$this->template->write_view(

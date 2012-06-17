@@ -56,7 +56,7 @@ class CRUD {
 	/**
 	 * Local method 
 	 */
-	private function print_html($data)
+	private function print_list_html($data)
 	{
 		$indexColumn = FALSE;
 		$numRow = 0;
@@ -79,17 +79,16 @@ class CRUD {
 		}
 		/* Display all column header which set to display */
 		foreach ($this->_definitions as $colName => $colDefine) {
-			if ( ! $colDefine['display'] )
+			if ( $colDefine['display'] )
 			{
-				continue;
+				$header = $colName;
+				if(isset($colDefine['header']))
+				{
+					$header = $colDefine['header']; 
+				}
+				$result .= "\t\t<th>".$header."</th>\n";
+				$numRow++;// Calculate num rows 
 			}
-			$header = $colName;
-			if(isset($colDefine['header']))
-			{
-				$header = $colDefine['header']; 
-			}
-			$result .= "\t\t<th>".$header."</th>\n";
-			$numRow++;// Calculate num rows 
 		}
 		/* display action column header */
 		if ($actionColumn)
@@ -188,6 +187,23 @@ class CRUD {
 			."</table>\n";
 		return $result;
 	}
+	
+	private function print_detail_html($data)
+	{
+		$result = "<table>\n";
+		foreach ($this->_definitions as $colName => $colDefine) {
+			if( $colDefine['display'] )
+			{
+				$result .= "\t<tr><td>".$colDefine['header']."</td>"
+					."<td>".$data[$colName]."</td></tr>\n";
+			}
+		}
+		
+		$result .= "</table>\n";
+		
+		return $result;
+	}
+	
 	/**
 	 * Public method
 	 */
@@ -323,7 +339,7 @@ class CRUD {
 			array_push($result,$item);
 		}
 		
-		return self::print_html($result);
+		return self::print_list_html($result);
 	}
 	/**
 	 * Render detail view to a string 
@@ -331,6 +347,73 @@ class CRUD {
 	
 	public function render_detail()
 	{
+		$primaryCol = "";
 		
+		$this->CI->db->from($this->_tableName);
+		$i = 0;
+		$selectList = array($this->_tableName.".*");
+		
+		foreach ($this->_definitions as $colName => $colDefine) {
+			if (isset($colDefine['primary']) 
+				&& $colDefine['primary'] )
+				{
+					$primaryCol = $colName;
+				} 
+			if (isset($colDefine['ref']) 
+				&& count($colDefine['ref']) > 0 ) {
+				/* join and add to select list */
+					$displayCol = $colDefine['ref']['displayCol'];
+					
+					$chains = $colDefine['ref']['chain'];
+					
+					$prevTable = $this->_tableName;
+					$prevCol = $colName;
+					$currChain = $colDefine['ref']['firstChain']; 
+					
+					while(TRUE)
+					{
+						$chain = $chains[$currChain];
+						$indexCol = $chain['indexCol'];
+						
+						/* Join */
+						$this->CI->db->join("$currChain AS $currChain$i",
+							"$prevTable.$prevCol=$currChain$i.$indexCol");
+						
+						/* Checking last chain */
+						if ( $currChain == $colDefine['ref']['lastChain'] )
+						{
+							/* Add to selecting list */
+							array_push($selectList,"$currChain$i.$displayCol AS $colName");
+							
+							break;
+						}
+						
+						/* prepare for next loop */
+						$prevTable = $currChain.$i;
+						$prevCol = $chain['refCol'];
+						$currChain = $chain['nextChain'];
+					}
+					
+					$i++;
+			}
+		}
+		$this->CI->db->where($this->_tableName.".".$primaryCol,$this->_itemId);
+		$this->CI->db->limit(1);
+		$this->CI->db->select(implode(",", $selectList));
+		$query = $this->CI->db
+			->get();
+		if ($query->num_rows() != 1) {
+			/* Item is not found */
+			return NULL;
+		}
+		$row = $query->row();
+		$result = array();
+		foreach ($this->_definitions as $colName => $colDefine) {
+			if ($colDefine['display']) {
+				$result[$colName] = $row->$colName;
+			}
+		}
+		
+		return self::print_detail_html($result);
 	}
 }
