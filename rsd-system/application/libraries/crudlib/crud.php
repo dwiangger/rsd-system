@@ -36,7 +36,7 @@ class CRUD {
 	 */
 	var $_query;
 	var $_pageSize;
-	var $_pageIndex;
+	var $_pageIndex; /* count from 1 */
 	var $_totalResults;
 	/**
 	 * Local method 
@@ -72,7 +72,7 @@ class CRUD {
 		$result .= "\t</tr>\n";
 		
 		/* Display index from first item's index */
-		$i = $this->_pageIndex*$this->_pageSize;
+		$i = ($this->_pageIndex-1)*$this->_pageSize;
 		/* Ddisplay each row */
 		foreach ($data as $row) {
 			$result .= "\t<tr>\n";
@@ -95,7 +95,7 @@ class CRUD {
 		$navLink = $this->_options["navLink"];
 		$result .= "\t<tr><td colspan=\"$numRow\">";
 		/* Previous link */
-		if ($this->_pageIndex > 0) {
+		if ($this->_pageIndex > 1) {
 			$result .= "<a href=\"".str_replace("{page-index}", "", $navLink)."\" title=\"First page\" class=\"btn btn-mini\">"
 					."<i class=\"icon-fast-backward\"></i></a>";
 			$result .= "<a href=\"".str_replace("{page-index}", ($this->_pageIndex-1), $navLink)."\" title=\"Previous page\" class=\"btn btn-mini\">"
@@ -108,7 +108,7 @@ class CRUD {
 					."<i class=\"icon-step-backward\"></i></a>";
 		}
 		/* Display page, total ... */
-		$totalPage = (int)($this->_totalResults/$this->_pageSize);
+		$totalPage = (int)($this->_totalResults/$this->_pageSize)+1;
 		$result .= "<span>Page ".$this->_pageIndex."/".$totalPage." totals ".$this->_totalResults." result(s)</span>";
 		/* Next link */
 		if ( $this->_pageIndex >= $totalPage )
@@ -237,7 +237,9 @@ class CRUD {
 		$this->_totalResults = $this->CI->db->count_all_results();
 		
 		/* Get specific page */
-		$this->CI->db->limit($this->_pageSize,$this->_pageIndex*$this->_pageSize);
+		$this->CI->db->limit(
+			$this->_pageSize,	// Limit 
+			($this->_pageIndex-1)*$this->_pageSize);	// offset
 		$query = $this->CI->db->select(implode(",", $selectList));
 		$query = $this->CI->db
 			->get();

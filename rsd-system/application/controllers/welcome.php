@@ -69,7 +69,7 @@ class Welcome extends CI_Controller {
 		$this->template->render();
 	}
 	
-	public function test($page=0)
+	public function test($page=1)
 	{
 		$this->load->library('crudlib/crud');
 		$rsl = TRUE;
