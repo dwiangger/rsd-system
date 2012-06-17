@@ -77,7 +77,12 @@ class Welcome extends CI_Controller {
 		/* Attack */
 		$this->crud->TableName("projects");
 		$this->crud->Option("indexColumn",TRUE);
-		$this->crud->Option("navLink",$this->config->item('base_url')."index.php/welcome/test/{page-index}");
+		$this->crud->Option("navLink",
+			$this->config->item('base_url')."index.php/welcome/test/{page-index}");
+		//$this->crud->Option("editLink",
+		//	$this->config->item('base_url')."index.php/welcome/edit/{item-index}");
+		$this->crud->Option("confirmDeleteLink",
+			$this->config->item('base_url')."index.php/welcome/delete/{item-index}");
 		$this->crud->PageSize(10);
 		$this->crud->PageIndex($page);
 		$this->crud->ColumnDefine(array(

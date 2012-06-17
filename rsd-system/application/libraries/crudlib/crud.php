@@ -29,6 +29,17 @@ class CRUD {
 	 * General variable
 	 */
 	var $_tableName;
+	/**
+	 * @var array of option
+	 * 	indexColumn		TRUE/FALSE		show/hide index column in list viewing 
+	 * 	navLink			string			navigation link in list viewing, 
+	 * 									using "{page-index}" present page index.
+	 * 	detailLink		string			link to detail form viewing
+	 * 	confirmDeleleLink		string	link to confirm delete form
+	 * 	deleteLink		string			link to action delete  
+	 * 	editLink		string			link to edit form 
+	 * 	updateLink		string			Link to action update 
+	 */
 	var $_options; 
 	var $_definitions;
 	/**
@@ -54,7 +65,13 @@ class CRUD {
 			$numRow++;	// For index column
 			$result .= "\t\t<th>#</th>\n"; // Header of ind 
 		}
-
+		/* Is editable or deletable - Action column*/
+		$actionColumn = FALSE;
+		if ( isset($this->_options['editLink']) 
+			|| isset($this->_options['confirmDeleteLink']) )
+		{
+			$actionColumn = TRUE;
+		}
 		/* Display all column header which set to display */
 		foreach ($this->_definitions as $colName => $colDefine) {
 			if ( ! $colDefine['display'] )
@@ -68,6 +85,12 @@ class CRUD {
 			}
 			$result .= "\t\t<th>".$header."</th>\n";
 			$numRow++;// Calculate num rows 
+		}
+		/* display action column header */
+		if ($actionColumn)
+		{
+			$result .= "\t\t<th>Action</th>\n";
+			$numRow++;
 		}
 		$result .= "\t</tr>\n";
 		
@@ -88,6 +111,27 @@ class CRUD {
 					$result .= "\t\t<td>".$row[$colName]."</td>\n";
 				}
 			}
+			/* Action column */
+			if ($actionColumn) {
+				$result .= "\t\t<td><div class=\"btn-group\">\n"
+					."\t\t\t<a class=\"btn btn-mini\" href=\"#\"><i class=\"icon-cog\"></i></a>\n"
+					."\t\t\t<a class=\"btn btn-mini dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\"><span class=\"caret\"></span></a>\n"
+					."\t\t\t<ul class=\"dropdown-menu\">\n";
+				if (isset($this->_options['editLink']))
+				{
+					$result .= "\t\t\t\t<li><a href=\""
+						.$this->_options['editLink']
+						."\"><i class=\"icon-pencil\"></i> Edit</a></li>\n";
+				}
+				if (isset($this->_options['confirmDeleteLink']))
+				{
+					$result .= "\t\t\t\t<li><a href=\""
+						.$this->_options['confirmDeleteLink']
+						."\"><i class=\"icon-trash\"></i> Delete</a></li>\n";
+				}
+				$result .= "\t\t\t</ul>\n\t\t</div></td>";
+			}
+			
 			$result .= "\t</tr>\n";
 		}
 		
