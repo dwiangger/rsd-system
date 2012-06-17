@@ -68,7 +68,8 @@ class CRUD {
 		/* Is editable or deletable - Action column*/
 		$actionColumn = FALSE;
 		if ( isset($this->_options['editLink']) 
-			|| isset($this->_options['confirmDeleteLink']) )
+			|| isset($this->_options['confirmDeleteLink'])
+			|| isset($this->_options['detailLink']) )
 		{
 			$actionColumn = TRUE;
 		}
@@ -117,6 +118,17 @@ class CRUD {
 					."\t\t\t<a class=\"btn btn-mini\" href=\"#\"><i class=\"icon-cog\"></i></a>\n"
 					."\t\t\t<a class=\"btn btn-mini dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\"><span class=\"caret\"></span></a>\n"
 					."\t\t\t<ul class=\"dropdown-menu\">\n";
+				if (isset($this->_options['detailLink']))
+				{
+					$result .= "\t\t\t\t<li><a href=\""
+						.$this->_options['confirmDeleteLink']
+						."\"><i class=\"icon-list-alt\"></i> Detail</a></li>\n";
+					if (isset($this->_options['editLink'])
+						|| isset($this->_options['confirmDeleteLink']) )
+					{
+						$result .= "\t\t\t\t<li class=\"divider\"></li>";
+					}	
+				}
 				if (isset($this->_options['editLink']))
 				{
 					$result .= "\t\t\t\t<li><a href=\""
