@@ -61,7 +61,7 @@ class CRUD {
 		$indexColumn = FALSE;
 		$numRow = 0;
 		/* Init table */
-		$result = "\n<table>\n\t<tr>\n";
+		$result = "\n<div class=\"crud-list-view\"><table>\n\t<tr>\n";
 		/* Checking for index column displaying */
 		if ( isset($this->_options['indexColumn']) && $this->_options['indexColumn'])
 		{
@@ -184,13 +184,13 @@ class CRUD {
 					."<i class=\"icon-fast-forward\"></i></a>";
 		}
 		$result .= "</td></tr>\n"
-			."</table>\n";
+			."</table></div><!-- crud-list-view -->\n";
 		return $result;
 	}
 	
 	private function print_detail_html($data)
 	{
-		$result = "<form class=\"form-horizontal\">\n<fieldset>\n";
+		$result = "<div class=\"crud-detail-view\"><form class=\"form-horizontal\">\n<fieldset>\n";
 		foreach ($this->_definitions as $colName => $colDefine) {
 			if( $colDefine['display'] )
 			{
@@ -217,7 +217,7 @@ class CRUD {
 						.$this->_options['confirmDeleteLink']
 						."\"><i class=\"icon-trash icon-white\"></i> Delete</a></div>\n";
 				}
-				$result .= "</fieldset>\n</form>\n";
+				$result .= "</fieldset>\n</form></div><!-- crud-detail-view -->\n";
 			}
 		
 		return $result;
@@ -436,4 +436,18 @@ class CRUD {
 		return self::print_detail_html($result);
 	}
  
+	public function render_confirmDelete()
+	{
+		$result = "<div class=\"crud-confirm-delete span6 offset3\">\n";
+		$result .= "<div class=\"alert alert-error\">\n"
+			."\t<div class=\"row\"><div class=\"span6\">Are you sure you want to delete <strong>{item}</strong> ?</div></div>\n"
+			."<br />"
+			."\t<div class=\"row\"><div class=\"span6\">"
+				."<a class=\"btn btn-danger\" href=\"#\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n"
+				."<a class=\"btn\" href=\"#\">Cancel</a>"
+			."</div></div>\n";
+		$result .= "</div><!-- crud-confirm-delete -->\n";
+		
+		return $result;
+	}
 }
