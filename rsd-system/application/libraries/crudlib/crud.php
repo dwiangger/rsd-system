@@ -201,9 +201,24 @@ class CRUD {
 			}
 		}
 		
-		$result .= "<a class=\"btn btn-info\" href=\"#\"><i class=\"icon-pencil icon-white\"></i> Edit</a>\n"
-        	."<a class=\"btn btn-danger\" href=\"#\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n" 
-			."</fieldset>\n</form>\n";
+		if (isset($this->_options['confirmDeleteLink'])
+			|| isset($this->_options['editLink']) )
+			{
+				$result .= "<div class=\"form-actions\">\n";
+				if ( isset($this->_options['editLink']) )
+				{
+					$result .= "\t<a class=\"btn btn-info\" href=\""
+						.$this->_options['editLink']
+						."\"><i class=\"icon-pencil icon-white\"></i> Edit</a>\n";
+				}
+				if ( isset($this->_options['confirmDeleteLink']) )
+				{
+					$result .= "\t<a class=\"btn btn-danger\" href=\""
+						.$this->_options['confirmDeleteLink']
+						."\"><i class=\"icon-trash icon-white\"></i> Delete</a></div>\n";
+				}
+				$result .= "</fieldset>\n</form>\n";
+			}
 		
 		return $result;
 	}
@@ -420,4 +435,5 @@ class CRUD {
 		
 		return self::print_detail_html($result);
 	}
+ 
 }
