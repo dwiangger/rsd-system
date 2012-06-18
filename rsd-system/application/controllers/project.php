@@ -83,6 +83,21 @@ class Project extends CI_Controller {
 		$this->template->render();
 	}
 	/**
+	 * provide "project" create form & create action 
+	 */
+	public function create()
+	{
+		/* Check permission */
+		$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		
+		/* If data is posted, validate, create, redirect */
+		
+		
+		/* Display a creating form */
+		
+		
+	}
+	/**
 	 * Display update form 
 	 */
 	public function edit()
