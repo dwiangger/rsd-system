@@ -450,4 +450,60 @@ class CRUD {
 		
 		return $result;
 	}
+	
+	public function render_createForm()
+	{
+		/*
+		 * NOTE: only allow 1-chain-reference-column. 
+		 */
+		$result = "";
+		/* Get table struct */
+		$query = $this->CI->db->query("DESCRIBE ".$this->CI->db->dbprefix($this->_tableName));
+		$tableInfo = array();
+		foreach ($query->result() as $row) {
+			$tableInfo[$row->Field] = array(
+				'type' => $row->Type,
+				'null' => $row->Null,
+				'key' => $row->Key,
+				'default' => $row->Default,
+				'extra' => $row->Extra
+			);
+		}
+		$query->free_result();
+		/* compare to _definitions */
+		
+		/* display form */
+		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\">"
+    		."<fieldset>"
+    		."<legend>Create new <strong>{item}</strong>:</legend>";
+		foreach ($tableInfo as $colName => $colDefine) {
+			if ( strpos($colDefine['extra'],'auto_increment') !== FALSE )
+			{
+				/* auto-increment column, no need to input */
+				continue;
+			}
+			if (count($this->_definitions[$colName]['ref']) > 0)
+			{
+				/* This is an reference column 
+				$this->db->distinct();
+				$this->CI->db->select();//indexCol, displayCol
+				$this->CI->db->from();//ref->chain->first
+				/* */
+			}
+			$result .= "<div class=\"control-group\">"
+			    ."<label class=\"control-label\" for=\"$colName\">".$this->_definitions[$colName]['header']."</label>"
+			    ."<div class=\"controls\">"
+			    ."<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">"
+			    ."</div>"
+			    ."</div>";
+		}
+    	$result .= "</fieldset>"
+    		."<div class=\"form-actions\">"
+    		."<a class=\"btn btn-primary\" href=\"#\"><i class=\"icon-file icon-white\"></i> Create</a>\n"
+			."<a class=\"btn\" href=\"#\">Cancel</a>"
+    		."</div>"
+			."</form></div><!-- crud-create-form -->";
+		/* return */
+		return $result;		
+	}
 }

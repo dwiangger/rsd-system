@@ -120,7 +120,7 @@ class Welcome extends CI_Controller {
 		$this->crud->ItemId(1);
 		
 		//$data = $this->crud->render_detail();
-		 $data = $this->crud->render_confirmDelete();
+		 $data = $this->crud->render_createForm();
 		
 		/* Result */
 		$this->template->write_view(
