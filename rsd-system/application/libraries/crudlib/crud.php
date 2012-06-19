@@ -514,7 +514,20 @@ class CRUD {
 				$result .= "\t</select>\n";
 			}else 
 			{
-				/* Based on definitions[inputType] */
+				/* Based on definitions[inputType]:
+				 * 	textarea
+				 * 	checkbox
+				 * 	---
+				 * 	select
+				 * 	multiple-select
+				 * 	radio
+				 * 	---
+				 * 	(file-input)
+				 * 	--- 
+				 * 	textbox (default)
+				 * ----
+				 * Compose with data type to set validation
+				 */
 				$inputType = 'textbox';
 				if ( isset($this->_definitions[$colName]['inputType']) )
 				{
@@ -525,7 +538,14 @@ class CRUD {
 					case "textarea":
 						$result .= "\t<textarea class=\"input-xlarge\" id=\"$colName\" name=\"$colName\" rows=\"3\" style=\"resize:none;\"></textarea>\n";
 						break;
-					/* Default: based on data type */
+					/* Default: based on data type: 
+					 * 	char/varchar	: textbox
+					 * 	date/datetime/time	: textbox+js
+					 * 	text	: textarea
+					 * 	enum	: select 
+					 * 	int		: textbox+js 
+					 * 	decimal/float/double/real	: textbox+js 
+					 */
 					case "textbox": 
 					default: 
 						$result .= "\t<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">\n";
