@@ -470,8 +470,6 @@ class CRUD {
 			);
 		}
 		$query->free_result();
-		/* compare to _definitions */
-		
 		/* display form */
 		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\">"
     		."<fieldset>"
@@ -507,6 +505,7 @@ class CRUD {
 			    ."<div class=\"controls\">";
 			if ( $refValue !== FALSE )
 			{
+				/* Reference column: display a select box */
 				$result .= "<select>";
 				foreach ($refValue as $key => $value) {
 					$result .= "<option value=\"$key\">$value</option>";
@@ -514,7 +513,23 @@ class CRUD {
 				$result .= "</select>";
 			}else 
 			{
-				$result .= "<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">";
+				/* Based on definitions[inputType] */
+				$inputType = 'textbox';
+				if ( isset($this->_definitions[$colName]['inputType']) )
+				{
+					$inputType = strtolower($this->_definitions[$colName]['inputType']); 
+				}
+				switch ($inputType)
+				{
+					case "textarea":
+						$result .= "<textarea class=\"input-xlarge\" id=\"$colName\" name=\"$colName\" rows=\"3\" style=\"resize:none;\"></textarea>";
+						break;
+					/* Default: based on data type */
+					case "textbox": 
+					default: 
+						$result .= "<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">";
+						break;
+				}
 			}
 			$result .= "</div>"
 			    ."</div>";
