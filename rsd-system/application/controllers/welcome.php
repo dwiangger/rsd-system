@@ -75,7 +75,9 @@ class Welcome extends CI_Controller {
 		$rsl = TRUE;
 		
 		/* Attack */
-		$this->crud->TableName("teams");
+		$this->crud->TableName("temp");
+		$this->crud->Option("render-by-data-type",TRUE);
+		/* 
 		$this->crud->ColumnDefine(array(
 			'id' => array(
 				'display' => FALSE,
@@ -111,7 +113,7 @@ class Welcome extends CI_Controller {
 				)
 			)
 		));
-		/* list */
+		/* list 
 		$this->crud->Option("indexColumn",TRUE);
 		$this->crud->Option("navLink",
 			$this->config->item('base_url')."index.php/welcome/test/{page-index}");
@@ -121,9 +123,9 @@ class Welcome extends CI_Controller {
 			$this->config->item('base_url')."index.php/welcome/delete/{item-index}");
 		$this->crud->PageSize(10);
 		$this->crud->PageIndex($page);
-		/* detail */
+		/* detail 
 		$this->crud->ItemId(1);
-		
+		/* */
 		//$data = $this->crud->render_detail();
 		 $data = $this->crud->render_createForm();
 		

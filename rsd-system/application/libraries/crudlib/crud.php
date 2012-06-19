@@ -457,6 +457,7 @@ class CRUD {
 		 * NOTE: only allow 1-chain-reference-column. 
 		 */
 		$result = "";
+		$renderByDataType = FALSE;
 		if (isset($this->_options['render-by-data-type']) 
 			&& $this->_options['render-by-data-type'] == TRUE ) {
 			$renderByDataType = TRUE;
@@ -504,9 +505,12 @@ class CRUD {
 				}
 				$query->free_result();
 			}
-			$result .= "<!-- ".$this->_tableName.".$colName -->\n" 
+			
+			$result .= "<!-- ".$this->_tableName.".$colName -->\n"
 				."<div class=\"control-group\">\n"
-			    ."\t<label class=\"control-label\" for=\"$colName\">".$this->_definitions[$colName]['header']."</label>\n"
+			    ."\t<label class=\"control-label\" for=\"$colName\">"
+			    .(isset($this->_definitions[$colName]['header'])?$this->_definitions[$colName]['header']:$colName)
+			    ."</label>\n"
 			    ."\t<div class=\"controls\">\n";
 			if ( $refValue !== FALSE )
 			{
@@ -583,25 +587,74 @@ class CRUD {
 						}
 						break;
 					/* Default: based on data type: 
-					 * 	char/varchar	: textbox
 					 * 	date/datetime/time	: textbox+js
 					 * 	text	: textarea
 					 * 	enum	: select 
 					 * 	int		: textbox+js 
-					 * 	decimal/float/double/real	: textbox+js 
+					 * 	decimal/float/double/real	: textbox+js
+					 * 	char/varchar/default	: textbox 
 					 */
 					case 'render-by-data-type':
-						
+						if ( strpos($colDefine['type'], 'datetime') === 0
+							|| strpos($colDefine['type'], 'date') === 0 
+							|| strpos($colDefine['type'], 'time') === 0 )// date/datetime/time
+						{
+							$result .= "\t<input type=\"text\" "
+								."class=\"input-xlarge\" "
+								."id=\"$colName\" "
+								."name=\"$colName\">\n";
+						}else if ( strpos($colDefine['type'], 'text') === 0 )// text
+						{
+							$result .= "\t<textarea class=\"input-xlarge\" "
+								."id=\"$colName\" "
+								."name=\"$colName\" "
+								."rows=\"3\" "
+								."style=\"resize:none;\">"
+								."</textarea>\n";
+						}else if ( strpos($colDefine['type'], 'enum') === 0 )// enum
+						{
+							$optList = substr($colDefine['type'], 5, strlen($colDefine['type'])-6);
+							// execpt "enum(" and ")"
+							$optList = explode(",", $optList);
+							
+							$result .= "\t\t<select name=\"$colName\" id=\"$colName\">\n";
+							foreach ($optList as $opt ) {
+								$opt = substr($opt, 1, strlen($opt)-2);
+								$result .= "\t\t\t<option value=\"$opt\">$opt</option>\n";
+							}
+							$result .= "\t\t</select>\n";
+						}else if ( strpos($colDefine['type'], 'int') === 0 )// int
+						{
+							$result .= "\t<input type=\"text\" "
+								."class=\"input-xlarge\" "
+								."id=\"$colName\" "
+								."name=\"$colName\">\n";
+						}else if ( strpos($colDefine['type'], 'decimal') === 0
+							|| strpos($colDefine['type'], 'float') === 0
+							|| strpos($colDefine['type'], 'double') === 0  
+							|| strpos($colDefine['type'], 'real') === 0 )// decimal/float/double/real
+						{
+							
+						}else //char/varchar/default
+						{
+							$result .= "\t<input type=\"text\" "
+								."class=\"input-xlarge\" "
+								."id=\"$colName\" "
+								."name=\"$colName\">\n";
+						}
 						break;
 					case 'not-render':
 					case "textbox":
 					default: 
-						$result .= "\t<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">\n";
+						$result .= "\t<input type=\"text\" "
+							."class=\"input-xlarge\" "
+							."id=\"$colName\" "
+							."name=\"$colName\">\n";
 						break;
 				}
 			}
 			$result .= "\t</div>\n"
-			    ."</div>\n";
+		    	."</div>\n";
 		}
     	$result .= "\t</fieldset>\n"
     		."\t<div class=\"form-actions\">\n"
