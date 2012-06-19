@@ -231,240 +231,7 @@ class CRUD {
 		return $result;
 	}
 	
-	/**
-	 * Public method
-	 */
-	/**
-	 * Get/set table name 
-	 */
-	public function TableName($tableName = NULL)
-	{
-		if ($tableName != NULL)
-		{
-			$this->_tableName = (string)$tableName;
-		}
-		return $this->_tableName;
-	}
-	
-	public function PageSize($pageSize = NULL)
-	{
-		if ($pageSize != NULL)
-		{
-			$this->_pageSize = (int)$pageSize; 
-		}
-		return $this->_pageSize;
-	}
-	
-	public function PageIndex($pageIndex = NULL)
-	{
-		if ($pageIndex != NULL)
-		{
-			$this->_pageIndex = (int)$pageIndex;
-		}
-		return $this->_pageIndex;
-	}
-
-	public function ColumnDefine($columnDefine = NULL)
-	{
-		if ($columnDefine != NULL) {
-			$this->_definitions = $columnDefine;
-		}
-		return $this->_definitions;
-	}
-	
-	public function Option($name,$value = NULL)
-	{
-		if ($value != NULL)
-		{
-			$this->_options[$name] = (string)$value;
-		}
-		return $this->_options[$name];
-	}
-	
-	public function ItemId($itemId = NULL)
-	{
-		if ($itemId != NULL)
-		{
-			$this->_itemId = (int)$itemId;
-		}
-		return $this->_itemId;
-	}
-	/**
-	 * Render list view to a string as a specific $type   
-	 */
-	public function render_list($type = "html")
-	{
-		/* Cache setup for 2 query 
-		 * 1. get count of all results. 
-		 * 2. get page of results.
-		 */
-		$this->CI->db->start_cache();
-		$this->CI->db->from($this->_tableName);
-		
-		$i = 0;
-		$selectList = array($this->_tableName.".*");
-			foreach ($this->_definitions as $colName => $colDefine) {
-			/* get primary key from _definitions to use in where clause */
-			if (isset($colDefine['primary']) 
-				&& $colDefine['primary'] )
-				{
-					$primaryCol = $colName;
-				}
-			/* Add a join clause if this column is reference to another column */
-			if (isset($colDefine['ref']) 
-				&& count($colDefine['ref']) > 0 ) {
-				/* join and add to select list */
-					$displayCol = $colDefine['ref']['displayCol'];
-					
-					$chains = $colDefine['ref']['chain'];
-					
-					$prevTable = $this->_tableName;
-					$prevCol = $colName;
-					$currChain = $colDefine['ref']['firstChain']; 
-					/* join through all chain */
-					while(TRUE)
-					{
-						$chain = $chains[$currChain];
-						$indexCol = $chain['indexCol'];
-						
-						/* Join */
-						$this->CI->db->join("$currChain AS $currChain$i",
-							"$prevTable.$prevCol=$currChain$i.$indexCol");
-						/* Checking last chain */
-						if ( $currChain == $colDefine['ref']['lastChain'] )
-						{
-							/* Add to selecting list */
-							array_push($selectList,"$currChain$i.$displayCol AS $colName");
-							break;
-						}
-						/* prepare for next loop */
-						$prevTable = $currChain.$i;
-						$prevCol = $chain['refCol'];
-						$currChain = $chain['nextChain'];
-					}
-					$i++;
-			}
-		}
-		$this->CI->db->stop_cache();
-		
-		/* Get count of all result */
-		$this->_totalResults = $this->CI->db->count_all_results();
-		
-		/* Get specific page */
-		$this->CI->db->limit(
-			$this->_pageSize,	// Limit 
-			($this->_pageIndex-1)*$this->_pageSize);	// offset
-		$query = $this->CI->db->select(implode(",", $selectList));
-		$query = $this->CI->db
-			->get();
-		/* generate result list as an array */
-		$result = array();
-		foreach ($query->result() as $row) {
-			$item = array();
-			foreach ($this->_definitions as $colName => $colDefine) {
-				if ( $colDefine["display"] )
-				{
-					$item[$colName] = $row->$colName;
-				}
-			}
-			array_push($result,$item);
-		}
-		/* pass to an ui-builder before output */
-		return self::print_list_html($result);
-	}
-	/**
-	 * Render detail view to a string 
-	 */
-	public function render_detail()
-	{
-		/* primary column, just accept one */
-		$primaryCol = "";
-		$i = 0;// counter to avoid ambiguous column name 
-		$selectList = array($this->_tableName.".*");// list of column need select from many tables 
-		$this->CI->db->from($this->_tableName);
-		
-		/* Loop through _definitions to build up query: join */
-		foreach ($this->_definitions as $colName => $colDefine) {
-			/* get primary key from _definitions to use in where clause */
-			if (isset($colDefine['primary']) 
-				&& $colDefine['primary'] )
-				{
-					$primaryCol = $colName;
-				}
-			/* Add a join clause if this column is reference to another column */
-			if (isset($colDefine['ref']) 
-				&& count($colDefine['ref']) > 0 ) {
-				/* join and add to select list */
-					$displayCol = $colDefine['ref']['displayCol'];
-					
-					$chains = $colDefine['ref']['chain'];
-					
-					$prevTable = $this->_tableName;
-					$prevCol = $colName;
-					$currChain = $colDefine['ref']['firstChain']; 
-					/* join through all chain */
-					while(TRUE)
-					{
-						$chain = $chains[$currChain];
-						$indexCol = $chain['indexCol'];
-						
-						/* Join */
-						$this->CI->db->join("$currChain AS $currChain$i",
-							"$prevTable.$prevCol=$currChain$i.$indexCol");
-						/* Checking last chain */
-						if ( $currChain == $colDefine['ref']['lastChain'] )
-						{
-							/* Add to selecting list */
-							array_push($selectList,"$currChain$i.$displayCol AS $colName");
-							break;
-						}
-						/* prepare for next loop */
-						$prevTable = $currChain.$i;
-						$prevCol = $chain['refCol'];
-						$currChain = $chain['nextChain'];
-					}
-					$i++;
-			}
-		}
-		/* Add general info & query */
-		$this->CI->db->where($this->_tableName.".".$primaryCol,$this->_itemId);
-		$this->CI->db->limit(1);
-		$this->CI->db->select(implode(",", $selectList));
-		$query = $this->CI->db
-			->get();
-		if ($query->num_rows() != 1) {
-			/* Item is not found */
-			return NULL;
-		}
-		$row = $query->row();
-		/* build up result object as an array */
-		$result = array();
-		foreach ($this->_definitions as $colName => $colDefine) {
-			if ($colDefine['display']) {
-				$result[$colName] = $row->$colName;
-			}
-		}
-		/* pass to a ui_builder before output */
-		return self::print_detail_html($result);
-	}
- 
-	public function render_confirmDelete()
-	{
-		/* just return a form to confirm deletation */
-		$result = "<div class=\"crud-confirm-delete span6 offset3\">\n";
-		$result .= "<div class=\"alert alert-error\">\n"
-			."\t<div class=\"row\"><div class=\"span6\">Are you sure you want to delete <strong>{item}</strong> ?</div></div>\n"
-			."<br />"
-			."\t<div class=\"row\"><div class=\"span6\">"
-				."<a class=\"btn btn-danger\" href=\"#\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n"
-				."<a class=\"btn\" href=\"#\">Cancel</a>"
-			."</div></div>\n";
-		$result .= "</div><!-- crud-confirm-delete -->\n";
-		
-		return $result;
-	}
-	
-	public function render_createForm()
+	private function print_detail_form($data, $buttons)
 	{
 		/*
 		 * NOTE: only allow 1-chain-reference-column. 
@@ -716,6 +483,247 @@ class CRUD {
     		."\t</div>\n"
 			."</form></div><!-- crud-create-form -->\n";
 		/* return */
-		return $result;		
+		return $result;
+	}
+	
+	/**
+	 * Public method
+	 */
+	/**
+	 * Get/set table name 
+	 */
+	public function TableName($tableName = NULL)
+	{
+		if ($tableName != NULL)
+		{
+			$this->_tableName = (string)$tableName;
+		}
+		return $this->_tableName;
+	}
+	
+	public function PageSize($pageSize = NULL)
+	{
+		if ($pageSize != NULL)
+		{
+			$this->_pageSize = (int)$pageSize; 
+		}
+		return $this->_pageSize;
+	}
+	
+	public function PageIndex($pageIndex = NULL)
+	{
+		if ($pageIndex != NULL)
+		{
+			$this->_pageIndex = (int)$pageIndex;
+		}
+		return $this->_pageIndex;
+	}
+
+	public function ColumnDefine($columnDefine = NULL)
+	{
+		if ($columnDefine != NULL) {
+			$this->_definitions = $columnDefine;
+		}
+		return $this->_definitions;
+	}
+	
+	public function Option($name,$value = NULL)
+	{
+		if ($value != NULL)
+		{
+			$this->_options[$name] = (string)$value;
+		}
+		return $this->_options[$name];
+	}
+	
+	public function ItemId($itemId = NULL)
+	{
+		if ($itemId != NULL)
+		{
+			$this->_itemId = (int)$itemId;
+		}
+		return $this->_itemId;
+	}
+	/**
+	 * Render list view to a string as a specific $type   
+	 */
+	public function render_list($type = "html")
+	{
+		/* Cache setup for 2 query 
+		 * 1. get count of all results. 
+		 * 2. get page of results.
+		 */
+		$this->CI->db->start_cache();
+		$this->CI->db->from($this->_tableName);
+		
+		$i = 0;
+		$selectList = array($this->_tableName.".*");
+			foreach ($this->_definitions as $colName => $colDefine) {
+			/* get primary key from _definitions to use in where clause */
+			if (isset($colDefine['primary']) 
+				&& $colDefine['primary'] )
+				{
+					$primaryCol = $colName;
+				}
+			/* Add a join clause if this column is reference to another column */
+			if (isset($colDefine['ref']) 
+				&& count($colDefine['ref']) > 0 ) {
+				/* join and add to select list */
+					$displayCol = $colDefine['ref']['displayCol'];
+					
+					$chains = $colDefine['ref']['chain'];
+					
+					$prevTable = $this->_tableName;
+					$prevCol = $colName;
+					$currChain = $colDefine['ref']['firstChain']; 
+					/* join through all chain */
+					while(TRUE)
+					{
+						$chain = $chains[$currChain];
+						$indexCol = $chain['indexCol'];
+						
+						/* Join */
+						$this->CI->db->join("$currChain AS $currChain$i",
+							"$prevTable.$prevCol=$currChain$i.$indexCol");
+						/* Checking last chain */
+						if ( $currChain == $colDefine['ref']['lastChain'] )
+						{
+							/* Add to selecting list */
+							array_push($selectList,"$currChain$i.$displayCol AS $colName");
+							break;
+						}
+						/* prepare for next loop */
+						$prevTable = $currChain.$i;
+						$prevCol = $chain['refCol'];
+						$currChain = $chain['nextChain'];
+					}
+					$i++;
+			}
+		}
+		$this->CI->db->stop_cache();
+		
+		/* Get count of all result */
+		$this->_totalResults = $this->CI->db->count_all_results();
+		
+		/* Get specific page */
+		$this->CI->db->limit(
+			$this->_pageSize,	// Limit 
+			($this->_pageIndex-1)*$this->_pageSize);	// offset
+		$query = $this->CI->db->select(implode(",", $selectList));
+		$query = $this->CI->db
+			->get();
+		/* generate result list as an array */
+		$result = array();
+		foreach ($query->result() as $row) {
+			$item = array();
+			foreach ($this->_definitions as $colName => $colDefine) {
+				if ( $colDefine["display"] )
+				{
+					$item[$colName] = $row->$colName;
+				}
+			}
+			array_push($result,$item);
+		}
+		/* pass to an ui-builder before output */
+		return self::print_list_html($result);
+	}
+	/**
+	 * Render detail view to a string 
+	 */
+	public function render_detail()
+	{
+		/* primary column, just accept one */
+		$primaryCol = "";
+		$i = 0;// counter to avoid ambiguous column name 
+		$selectList = array($this->_tableName.".*");// list of column need select from many tables 
+		$this->CI->db->from($this->_tableName);
+		
+		/* Loop through _definitions to build up query: join */
+		foreach ($this->_definitions as $colName => $colDefine) {
+			/* get primary key from _definitions to use in where clause */
+			if (isset($colDefine['primary']) 
+				&& $colDefine['primary'] )
+				{
+					$primaryCol = $colName;
+				}
+			/* Add a join clause if this column is reference to another column */
+			if (isset($colDefine['ref']) 
+				&& count($colDefine['ref']) > 0 ) {
+				/* join and add to select list */
+					$displayCol = $colDefine['ref']['displayCol'];
+					
+					$chains = $colDefine['ref']['chain'];
+					
+					$prevTable = $this->_tableName;
+					$prevCol = $colName;
+					$currChain = $colDefine['ref']['firstChain']; 
+					/* join through all chain */
+					while(TRUE)
+					{
+						$chain = $chains[$currChain];
+						$indexCol = $chain['indexCol'];
+						
+						/* Join */
+						$this->CI->db->join("$currChain AS $currChain$i",
+							"$prevTable.$prevCol=$currChain$i.$indexCol");
+						/* Checking last chain */
+						if ( $currChain == $colDefine['ref']['lastChain'] )
+						{
+							/* Add to selecting list */
+							array_push($selectList,"$currChain$i.$displayCol AS $colName");
+							break;
+						}
+						/* prepare for next loop */
+						$prevTable = $currChain.$i;
+						$prevCol = $chain['refCol'];
+						$currChain = $chain['nextChain'];
+					}
+					$i++;
+			}
+		}
+		/* Add general info & query */
+		$this->CI->db->where($this->_tableName.".".$primaryCol,$this->_itemId);
+		$this->CI->db->limit(1);
+		$this->CI->db->select(implode(",", $selectList));
+		$query = $this->CI->db
+			->get();
+		if ($query->num_rows() != 1) {
+			/* Item is not found */
+			return NULL;
+		}
+		$row = $query->row();
+		/* build up result object as an array */
+		$result = array();
+		foreach ($this->_definitions as $colName => $colDefine) {
+			if ($colDefine['display']) {
+				$result[$colName] = $row->$colName;
+			}
+		}
+		/* pass to a ui_builder before output */
+		return self::print_detail_html($result);
+	}
+ 
+	public function render_confirmDelete()
+	{
+		/* just return a form to confirm deletation */
+		$result = "<div class=\"crud-confirm-delete span6 offset3\">\n";
+		$result .= "<div class=\"alert alert-error\">\n"
+			."\t<div class=\"row\"><div class=\"span6\">Are you sure you want to delete <strong>{item}</strong> ?</div></div>\n"
+			."<br />"
+			."\t<div class=\"row\"><div class=\"span6\">"
+				."<a class=\"btn btn-danger\" href=\"#\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n"
+				."<a class=\"btn\" href=\"#\">Cancel</a>"
+			."</div></div>\n";
+		$result .= "</div><!-- crud-confirm-delete -->\n";
+		
+		return $result;
+	}
+	
+	public function render_createForm()
+	{
+		$data = array();
+		$buttons = array();
+		
+		return self::print_detail_form($data,$buttons);
 	}
 }
