@@ -471,9 +471,9 @@ class CRUD {
 		}
 		$query->free_result();
 		/* display form */
-		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\">"
-    		."<fieldset>"
-    		."<legend>Create new <strong>{item}</strong>:</legend>";
+		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\">\n"
+    		."\t<fieldset>\n"
+    		."\t\t<legend>Create new <strong>{item}</strong>:</legend>\n";
 		foreach ($tableInfo as $colName => $colDefine) {
 			if ( strpos($colDefine['extra'],'auto_increment') !== FALSE )
 			{
@@ -500,17 +500,18 @@ class CRUD {
 				}
 				$query->free_result();
 			}
-			$result .= "<div class=\"control-group\">"
-			    ."<label class=\"control-label\" for=\"$colName\">".$this->_definitions[$colName]['header']."</label>"
-			    ."<div class=\"controls\">";
+			$result .= "<!-- ".$this->_tableName.".$colName -->\n" 
+				."<div class=\"control-group\">\n"
+			    ."\t<label class=\"control-label\" for=\"$colName\">".$this->_definitions[$colName]['header']."</label>\n"
+			    ."\t<div class=\"controls\">\n";
 			if ( $refValue !== FALSE )
 			{
 				/* Reference column: display a select box */
-				$result .= "<select>";
+				$result .= "\t\t<select>\n";
 				foreach ($refValue as $key => $value) {
-					$result .= "<option value=\"$key\">$value</option>";
+					$result .= "\t\t\t<option value=\"$key\">$value</option>\n";
 				}
-				$result .= "</select>";
+				$result .= "\t</select>\n";
 			}else 
 			{
 				/* Based on definitions[inputType] */
@@ -522,24 +523,24 @@ class CRUD {
 				switch ($inputType)
 				{
 					case "textarea":
-						$result .= "<textarea class=\"input-xlarge\" id=\"$colName\" name=\"$colName\" rows=\"3\" style=\"resize:none;\"></textarea>";
+						$result .= "\t<textarea class=\"input-xlarge\" id=\"$colName\" name=\"$colName\" rows=\"3\" style=\"resize:none;\"></textarea>\n";
 						break;
 					/* Default: based on data type */
 					case "textbox": 
 					default: 
-						$result .= "<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">";
+						$result .= "\t<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">\n";
 						break;
 				}
 			}
-			$result .= "</div>"
-			    ."</div>";
+			$result .= "\t</div>\n"
+			    ."</div>\n";
 		}
-    	$result .= "</fieldset>"
-    		."<div class=\"form-actions\">"
-    		."<a class=\"btn btn-primary\" href=\"#\"><i class=\"icon-file icon-white\"></i> Create</a>\n"
-			."<a class=\"btn\" href=\"#\">Cancel</a>"
-    		."</div>"
-			."</form></div><!-- crud-create-form -->";
+    	$result .= "\t</fieldset>\n"
+    		."\t<div class=\"form-actions\">\n"
+    		."\t\t<a class=\"btn btn-primary\" href=\"#\"><i class=\"icon-file icon-white\"></i> Create</a>\n"
+			."\t\t<a class=\"btn\" href=\"#\">Cancel</a>\n"
+    		."\t</div>\n"
+			."</form></div><!-- crud-create-form -->\n";
 		/* return */
 		return $result;		
 	}
