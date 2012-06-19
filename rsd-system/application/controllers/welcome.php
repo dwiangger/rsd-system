@@ -88,7 +88,11 @@ class Welcome extends CI_Controller {
 			'description' => array(
 				'display' => TRUE,
 				'header' => "Description",
-				'inputType' => 'textarea'
+				'inputType' => 'textarea',
+				'inputData' => array(
+					'value' => 'team desc',
+					'description' => 'Team description'
+				)
 			),
 			'project_id' => array(
 				'display' => TRUE,

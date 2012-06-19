@@ -457,6 +457,10 @@ class CRUD {
 		 * NOTE: only allow 1-chain-reference-column. 
 		 */
 		$result = "";
+		if (isset($this->_options['render-by-data-type']) 
+			&& $this->_options['render-by-data-type'] == TRUE ) {
+			$renderByDataType = TRUE;
+		}
 		/* Get table struct */
 		$query = $this->CI->db->query("DESCRIBE ".$this->CI->db->dbprefix($this->_tableName));
 		$tableInfo = array();
@@ -511,16 +515,21 @@ class CRUD {
 				foreach ($refValue as $key => $value) {
 					$result .= "\t\t\t<option value=\"$key\">$value</option>\n";
 				}
-				$result .= "\t</select>\n";
+				$result .= "\t\t</select>\n";
 			}else 
 			{
-				/* Based on definitions[inputType]:
+				/* Based on definitions[inputType], 
+				 * some type need more input data in definitions[inputData]:
 				 * 	textarea
 				 * 	checkbox
+				 * 		Description-value 
 				 * 	---
 				 * 	select
+				 * 		Description-value list
 				 * 	multiple-select
+				 * 		Description-value list
 				 * 	radio
+				 * 		Description-value list
 				 * 	---
 				 * 	(file-input)
 				 * 	--- 
@@ -528,7 +537,7 @@ class CRUD {
 				 * ----
 				 * Compose with data type to set validation
 				 */
-				$inputType = 'textbox';
+				$inputType = $renderByDataType?'render-by-data-type':'not-render';
 				if ( isset($this->_definitions[$colName]['inputType']) )
 				{
 					$inputType = strtolower($this->_definitions[$colName]['inputType']); 
@@ -536,7 +545,42 @@ class CRUD {
 				switch ($inputType)
 				{
 					case "textarea":
-						$result .= "\t<textarea class=\"input-xlarge\" id=\"$colName\" name=\"$colName\" rows=\"3\" style=\"resize:none;\"></textarea>\n";
+						$result .= "\t<textarea class=\"input-xlarge\" "
+							."id=\"$colName\" "
+							."name=\"$colName\" "
+							."rows=\"3\" "
+							."style=\"resize:none;\">"
+							."</textarea>\n";
+						break;
+					case "checkbox":
+						$result .= "\t<label class=\"checkbox inline\">"
+							."<input type=\"checkbox\" "
+							."class=\"input-xlarge\" "
+							."id=\"$colName\" "
+							."name=\"$colName\" "
+							."value=\"".$this->_definitions[$colName]['inputData']['value']."\""
+							."> ".$this->_definitions[$colName]['inputData']['description']."</label>\n";
+						break;
+					case "select":
+						$result .= "\t\t<select name=\"$colName\" id=\"$colName\">\n";
+						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
+							$result .= "\t\t\t<option value=\"$value\">$description</option>\n";
+						}
+						$result .= "\t\t</select>\n";
+						break;
+					case "multiple-select":
+						$result .= "\t\t<select multiple=\"multiple\" name=\"$colName\" id=\"$colName\">\n";
+						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
+							$result .= "\t\t\t<option value=\"$value\">$description</option>\n";
+						}
+						$result .= "\t\t</select>\n";
+						break;
+					case "radio":
+						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
+							$result .= "\t\t<label class=\"radio\">"
+								."<input name=\"$colName\" id=\"$colName\" "
+									."value=\"$value\" type=\"radio\"> $description\n";
+						}
 						break;
 					/* Default: based on data type: 
 					 * 	char/varchar	: textbox
@@ -546,7 +590,11 @@ class CRUD {
 					 * 	int		: textbox+js 
 					 * 	decimal/float/double/real	: textbox+js 
 					 */
-					case "textbox": 
+					case 'render-by-data-type':
+						
+						break;
+					case 'not-render':
+					case "textbox":
 					default: 
 						$result .= "\t<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">\n";
 						break;
