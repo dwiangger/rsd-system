@@ -482,19 +482,41 @@ class CRUD {
 				/* auto-increment column, no need to input */
 				continue;
 			}
-			if (count($this->_definitions[$colName]['ref']) > 0)
+			$refValue = FALSE;
+			if ( isset($this->_definitions[$colName]['ref']) 
+				&& count($this->_definitions[$colName]['ref']) > 0)
 			{
-				/* This is an reference column 
-				$this->db->distinct();
-				$this->CI->db->select();//indexCol, displayCol
-				$this->CI->db->from();//ref->chain->first
+				/* This is an reference column */
+				$ref = $this->_definitions[$colName]['ref'];
+				$indexCol = $ref['chain'][$ref['firstChain']]['indexCol'];// IndexCol of first/only reference table
+				$displayCol = $ref['displayCol'];// displayCol of first/only reference table
+				
+				$this->CI->db->distinct();
+				$this->CI->db->select("$indexCol,$displayCol"); 
+				$this->CI->db->from($ref['firstChain']);//ref->chain->first
 				/* */
+				$query = $this->CI->db->get();
+				
+				foreach ($query->result() as $row) {
+					$refValue[$row->$indexCol] = $row->$displayCol;
+				}
+				$query->free_result();
 			}
 			$result .= "<div class=\"control-group\">"
 			    ."<label class=\"control-label\" for=\"$colName\">".$this->_definitions[$colName]['header']."</label>"
-			    ."<div class=\"controls\">"
-			    ."<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">"
-			    ."</div>"
+			    ."<div class=\"controls\">";
+			if ( $refValue !== FALSE )
+			{
+				$result .= "<select>";
+				foreach ($refValue as $key => $value) {
+					$result .= "<option value=\"$key\">$value</option>";
+				}
+				$result .= "</select>";
+			}else 
+			{
+				$result .= "<input type=\"text\" class=\"input-xlarge\" id=\"$colName\" name=\"$colName\">";
+			}
+			$result .= "</div>"
 			    ."</div>";
 		}
     	$result .= "</fieldset>"
