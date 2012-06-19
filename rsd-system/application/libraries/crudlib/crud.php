@@ -231,7 +231,7 @@ class CRUD {
 		return $result;
 	}
 	
-	private function print_detail_form($data, $buttons)
+	private function print_detail_form($data, $action)
 	{
 		/*
 		 * NOTE: only allow 1-chain-reference-column. 
@@ -259,7 +259,8 @@ class CRUD {
 		
 		$query->free_result();
 		/* start display form */
-		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\">\n"
+		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\" "
+			."method=\"post\" action=\"$action\">\n"
     		."\t<fieldset>\n"
     		."\t\t<legend>Create new <strong>{item}</strong>:</legend>\n";
     	/* Loop all field to generate input element */
@@ -722,8 +723,8 @@ class CRUD {
 	public function render_createForm()
 	{
 		$data = array();
-		$buttons = array();
+		$action = "";
 		
-		return self::print_detail_form($data,$buttons);
+		return self::print_detail_form($data,$action);
 	}
 }
