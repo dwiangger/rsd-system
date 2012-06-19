@@ -61,6 +61,9 @@ class CRUD {
 	/**
 	 * Local method 
 	 */
+	/**
+	 * Based on _definitions, build html table displays list object in $data 
+	 */
 	private function print_list_html($data)
 	{
 		$indexColumn = FALSE;
@@ -300,7 +303,14 @@ class CRUD {
 		
 		$i = 0;
 		$selectList = array($this->_tableName.".*");
-		foreach ($this->_definitions as $colName => $colDefine) {
+			foreach ($this->_definitions as $colName => $colDefine) {
+			/* get primary key from _definitions to use in where clause */
+			if (isset($colDefine['primary']) 
+				&& $colDefine['primary'] )
+				{
+					$primaryCol = $colName;
+				}
+			/* Add a join clause if this column is reference to another column */
 			if (isset($colDefine['ref']) 
 				&& count($colDefine['ref']) > 0 ) {
 				/* join and add to select list */
@@ -311,7 +321,7 @@ class CRUD {
 					$prevTable = $this->_tableName;
 					$prevCol = $colName;
 					$currChain = $colDefine['ref']['firstChain']; 
-					
+					/* join through all chain */
 					while(TRUE)
 					{
 						$chain = $chains[$currChain];
@@ -320,22 +330,18 @@ class CRUD {
 						/* Join */
 						$this->CI->db->join("$currChain AS $currChain$i",
 							"$prevTable.$prevCol=$currChain$i.$indexCol");
-						
 						/* Checking last chain */
 						if ( $currChain == $colDefine['ref']['lastChain'] )
 						{
 							/* Add to selecting list */
 							array_push($selectList,"$currChain$i.$displayCol AS $colName");
-							
 							break;
 						}
-						
 						/* prepare for next loop */
 						$prevTable = $currChain.$i;
 						$prevCol = $chain['refCol'];
 						$currChain = $chain['nextChain'];
 					}
-					
 					$i++;
 			}
 		}
@@ -351,6 +357,7 @@ class CRUD {
 		$query = $this->CI->db->select(implode(",", $selectList));
 		$query = $this->CI->db
 			->get();
+		/* generate result list as an array */
 		$result = array();
 		foreach ($query->result() as $row) {
 			$item = array();
@@ -362,27 +369,29 @@ class CRUD {
 			}
 			array_push($result,$item);
 		}
-		
+		/* pass to an ui-builder before output */
 		return self::print_list_html($result);
 	}
 	/**
 	 * Render detail view to a string 
 	 */
-	
 	public function render_detail()
 	{
+		/* primary column, just accept one */
 		$primaryCol = "";
-		
+		$i = 0;// counter to avoid ambiguous column name 
+		$selectList = array($this->_tableName.".*");// list of column need select from many tables 
 		$this->CI->db->from($this->_tableName);
-		$i = 0;
-		$selectList = array($this->_tableName.".*");
 		
+		/* Loop through _definitions to build up query: join */
 		foreach ($this->_definitions as $colName => $colDefine) {
+			/* get primary key from _definitions to use in where clause */
 			if (isset($colDefine['primary']) 
 				&& $colDefine['primary'] )
 				{
 					$primaryCol = $colName;
-				} 
+				}
+			/* Add a join clause if this column is reference to another column */
 			if (isset($colDefine['ref']) 
 				&& count($colDefine['ref']) > 0 ) {
 				/* join and add to select list */
@@ -393,7 +402,7 @@ class CRUD {
 					$prevTable = $this->_tableName;
 					$prevCol = $colName;
 					$currChain = $colDefine['ref']['firstChain']; 
-					
+					/* join through all chain */
 					while(TRUE)
 					{
 						$chain = $chains[$currChain];
@@ -402,25 +411,22 @@ class CRUD {
 						/* Join */
 						$this->CI->db->join("$currChain AS $currChain$i",
 							"$prevTable.$prevCol=$currChain$i.$indexCol");
-						
 						/* Checking last chain */
 						if ( $currChain == $colDefine['ref']['lastChain'] )
 						{
 							/* Add to selecting list */
 							array_push($selectList,"$currChain$i.$displayCol AS $colName");
-							
 							break;
 						}
-						
 						/* prepare for next loop */
 						$prevTable = $currChain.$i;
 						$prevCol = $chain['refCol'];
 						$currChain = $chain['nextChain'];
 					}
-					
 					$i++;
 			}
 		}
+		/* Add general info & query */
 		$this->CI->db->where($this->_tableName.".".$primaryCol,$this->_itemId);
 		$this->CI->db->limit(1);
 		$this->CI->db->select(implode(",", $selectList));
@@ -431,18 +437,20 @@ class CRUD {
 			return NULL;
 		}
 		$row = $query->row();
+		/* build up result object as an array */
 		$result = array();
 		foreach ($this->_definitions as $colName => $colDefine) {
 			if ($colDefine['display']) {
 				$result[$colName] = $row->$colName;
 			}
 		}
-		
+		/* pass to a ui_builder before output */
 		return self::print_detail_html($result);
 	}
  
 	public function render_confirmDelete()
 	{
+		/* just return a form to confirm deletation */
 		$result = "<div class=\"crud-confirm-delete span6 offset3\">\n";
 		$result .= "<div class=\"alert alert-error\">\n"
 			."\t<div class=\"row\"><div class=\"span6\">Are you sure you want to delete <strong>{item}</strong> ?</div></div>\n"
@@ -461,7 +469,9 @@ class CRUD {
 		/*
 		 * NOTE: only allow 1-chain-reference-column. 
 		 */
+		/* Initial result string */
 		$result = "";
+		/* Initial render-by-data-type option */
 		$renderByDataType = FALSE;
 		if (isset($this->_options['render-by-data-type']) 
 			&& $this->_options['render-by-data-type'] == TRUE ) {
@@ -481,27 +491,36 @@ class CRUD {
 		}
 		
 		$query->free_result();
-		/* display form */
+		/* start display form */
 		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\">\n"
     		."\t<fieldset>\n"
     		."\t\t<legend>Create new <strong>{item}</strong>:</legend>\n";
+    	/* Loop all field to generate input element */
 		foreach ($tableInfo as $colName => $colDefine) {
 			if ( strpos($colDefine['extra'],'auto_increment') !== FALSE )
 			{
 				/* auto-increment column, no need to input */
 				continue;
 			}
+			/* 
+			 * Is this filed required/ has no default value 
+			 * Column has default==NULL but not allow NULL value
+			 */
 			$isRequired = FALSE;
 			if ($colDefine['null'] == 'no' 
 				&& $colDefine['default'] == NULL)
 				{
 					$isRequired = TRUE;
 				}
+			/* 
+			 * Is this field reference to another table
+			 * Define by _definitions option 
+			 */
 			$refValue = FALSE;
 			if ( isset($this->_definitions[$colName]['ref']) 
 				&& count($this->_definitions[$colName]['ref']) > 0)
 			{
-				/* This is an reference column */
+				/* This is an reference column, get seletion */
 				$ref = $this->_definitions[$colName]['ref'];
 				$indexCol = $ref['chain'][$ref['firstChain']]['indexCol'];// IndexCol of first/only reference table
 				$displayCol = $ref['displayCol'];// displayCol of first/only reference table
@@ -512,18 +531,22 @@ class CRUD {
 				/* */
 				$query = $this->CI->db->get();
 				
+				/* push options to array $refValue as id->display_text */
 				foreach ($query->result() as $row) {
 					$refValue[$row->$indexCol] = $row->$displayCol;
 				}
+				/* free result to prevent flood to next query */
 				$query->free_result();
 			}
-			
+			/* generate start of control group */
 			$result .= "<!-- ".$this->_tableName.".$colName -->\n"
 				."<div class=\"control-group\">\n"
 			    ."\t<label class=\"control-label\" for=\"$colName\">"
 			    .(isset($this->_definitions[$colName]['header'])?$this->_definitions[$colName]['header']:$colName)
+			    /* $colName is label if header is not set */
 			    ."</label>\n"
 			    ."\t<div class=\"controls\">\n";
+			/* Generate control */
 			if ( $refValue !== FALSE )
 			{
 				/* Reference column: display a select box */
@@ -611,7 +634,11 @@ class CRUD {
 					 * 	decimal/float/double/real	: textbox+js
 					 * 	char/varchar/default	: textbox 
 					 */
-					case 'render-by-data-type':
+					/*
+					 * $colDefine['type'] pattern as type(limit), 
+					 * Compare this way to ignore "(limit)"
+					 */
+					case 'render-by-data-type':/* all comparing must "===" due to issue 0==FALSE*/
 						if ( strpos($colDefine['type'], 'datetime') === 0
 							|| strpos($colDefine['type'], 'date') === 0 
 							|| strpos($colDefine['type'], 'time') === 0 )// date/datetime/time
@@ -665,6 +692,7 @@ class CRUD {
 								.($isRequired?$this->_requiredAttribute:'').">\n";
 						}
 						break;
+					/* all these type will be handle as default textbox */
 					case 'not-render':
 					case "textbox":
 					default: 
@@ -676,9 +704,11 @@ class CRUD {
 						break;
 				}
 			}
-			$result .= "\t</div>\n"
-		    	."</div>\n";
+			/* Close control group */
+			$result .= "\t</div><!-- close:controls -->\n"
+		    	."</div><!-- close:control-group -->\n";
 		}
+		/* button area */
     	$result .= "\t</fieldset>\n"
     		."\t<div class=\"form-actions\">\n"
     		."\t\t<a class=\"btn btn-primary\" href=\"#\"><i class=\"icon-file icon-white\"></i> Create</a>\n"
