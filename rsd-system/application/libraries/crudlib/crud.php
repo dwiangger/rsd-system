@@ -15,7 +15,8 @@ class CRUD {
 
 		/* load libraries, helpers manually in case not autoload */
 		$this->CI->load->database();
-
+		$this->_requiredAttribute = 'required="required"';
+		
 		log_message('debug', "crudlib/CRUD Class Initialized");
 	}
 	/**
@@ -53,6 +54,10 @@ class CRUD {
 	 * Variable for detail
 	 */
 	var $_itemId;
+	/**
+	 * Variable for new/edit form
+	 */
+	var $_requiredAttribute;
 	/**
 	 * Local method 
 	 */
@@ -467,13 +472,14 @@ class CRUD {
 		$tableInfo = array();
 		foreach ($query->result() as $row) {
 			$tableInfo[$row->Field] = array(
-				'type' => $row->Type,
-				'null' => $row->Null,
-				'key' => $row->Key,
+				'type' => strtolower($row->Type),
+				'null' => strtolower($row->Null),
+				'key' => strtolower($row->Key),
 				'default' => $row->Default,
-				'extra' => $row->Extra
+				'extra' => strtolower($row->Extra)
 			);
 		}
+		
 		$query->free_result();
 		/* display form */
 		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\">\n"
@@ -485,6 +491,12 @@ class CRUD {
 				/* auto-increment column, no need to input */
 				continue;
 			}
+			$isRequired = FALSE;
+			if ($colDefine['null'] == 'no' 
+				&& $colDefine['default'] == NULL)
+				{
+					$isRequired = TRUE;
+				}
 			$refValue = FALSE;
 			if ( isset($this->_definitions[$colName]['ref']) 
 				&& count($this->_definitions[$colName]['ref']) > 0)
@@ -515,7 +527,8 @@ class CRUD {
 			if ( $refValue !== FALSE )
 			{
 				/* Reference column: display a select box */
-				$result .= "\t\t<select>\n";
+				$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
+					.($isRequired?$this->_requiredAttribute:'').">\n";
 				foreach ($refValue as $key => $value) {
 					$result .= "\t\t\t<option value=\"$key\">$value</option>\n";
 				}
@@ -553,7 +566,8 @@ class CRUD {
 							."id=\"$colName\" "
 							."name=\"$colName\" "
 							."rows=\"3\" "
-							."style=\"resize:none;\">"
+							."style=\"resize:none;\" "
+							.($isRequired?$this->_requiredAttribute:'').">"
 							."</textarea>\n";
 						break;
 					case "checkbox":
@@ -566,14 +580,16 @@ class CRUD {
 							."> ".$this->_definitions[$colName]['inputData']['description']."</label>\n";
 						break;
 					case "select":
-						$result .= "\t\t<select name=\"$colName\" id=\"$colName\">\n";
+						$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
+							.($isRequired?$this->_requiredAttribute:'').">\n";
 						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
 							$result .= "\t\t\t<option value=\"$value\">$description</option>\n";
 						}
 						$result .= "\t\t</select>\n";
 						break;
 					case "multiple-select":
-						$result .= "\t\t<select multiple=\"multiple\" name=\"$colName\" id=\"$colName\">\n";
+						$result .= "\t\t<select multiple=\"multiple\" name=\"$colName\" id=\"$colName\" "
+							.($isRequired?$this->_requiredAttribute:'').">\n";
 						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
 							$result .= "\t\t\t<option value=\"$value\">$description</option>\n";
 						}
@@ -583,7 +599,8 @@ class CRUD {
 						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
 							$result .= "\t\t<label class=\"radio\">"
 								."<input name=\"$colName\" id=\"$colName\" "
-									."value=\"$value\" type=\"radio\"> $description\n";
+									."value=\"$value\" type=\"radio\" "
+									.($isRequired?$this->_requiredAttribute:'')."> $description\n";
 						}
 						break;
 					/* Default: based on data type: 
@@ -602,14 +619,16 @@ class CRUD {
 							$result .= "\t<input type=\"text\" "
 								."class=\"input-xlarge\" "
 								."id=\"$colName\" "
-								."name=\"$colName\">\n";
+								."name=\"$colName\" "
+								.($isRequired?$this->_requiredAttribute:'').">\n";
 						}else if ( strpos($colDefine['type'], 'text') === 0 )// text
 						{
 							$result .= "\t<textarea class=\"input-xlarge\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
 								."rows=\"3\" "
-								."style=\"resize:none;\">"
+								."style=\"resize:none;\" "
+								.($isRequired?$this->_requiredAttribute:'')." >"
 								."</textarea>\n";
 						}else if ( strpos($colDefine['type'], 'enum') === 0 )// enum
 						{
@@ -617,7 +636,8 @@ class CRUD {
 							// execpt "enum(" and ")"
 							$optList = explode(",", $optList);
 							
-							$result .= "\t\t<select name=\"$colName\" id=\"$colName\">\n";
+							$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
+								.($isRequired?$this->_requiredAttribute:'').">\n";
 							foreach ($optList as $opt ) {
 								$opt = substr($opt, 1, strlen($opt)-2);
 								$result .= "\t\t\t<option value=\"$opt\">$opt</option>\n";
@@ -628,7 +648,8 @@ class CRUD {
 							$result .= "\t<input type=\"text\" "
 								."class=\"input-xlarge\" "
 								."id=\"$colName\" "
-								."name=\"$colName\">\n";
+								."name=\"$colName\" "
+								.($isRequired?$this->_requiredAttribute:'').">\n";
 						}else if ( strpos($colDefine['type'], 'decimal') === 0
 							|| strpos($colDefine['type'], 'float') === 0
 							|| strpos($colDefine['type'], 'double') === 0  
@@ -640,7 +661,8 @@ class CRUD {
 							$result .= "\t<input type=\"text\" "
 								."class=\"input-xlarge\" "
 								."id=\"$colName\" "
-								."name=\"$colName\">\n";
+								."name=\"$colName\" "
+								.($isRequired?$this->_requiredAttribute:'').">\n";
 						}
 						break;
 					case 'not-render':
@@ -649,7 +671,8 @@ class CRUD {
 						$result .= "\t<input type=\"text\" "
 							."class=\"input-xlarge\" "
 							."id=\"$colName\" "
-							."name=\"$colName\">\n";
+							."name=\"$colName\" "
+							.($isRequired?$this->_requiredAttribute:'').">\n";
 						break;
 				}
 			}
