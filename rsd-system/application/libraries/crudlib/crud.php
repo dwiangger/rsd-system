@@ -25,6 +25,7 @@ class CRUD {
 		/* load libraries, helpers manually in case not autoload */
 		$this->CI->load->database();
 		$this->_requiredAttribute = 'required="required"';
+		$this->_primaryCol = NULL;
 		
 		log_message('debug', "crudlib/CRUD Class Initialized");
 	}
@@ -582,7 +583,26 @@ class CRUD {
 		/* Return selectList */ 
 		return $selectList;
 	}
-	
+	/**
+	 * Welform input array, remove all item which is not column name
+	 * @param array($colName => $value) $data
+	 */
+	private function trim_input_data($data)
+	{
+		$query = $this->CI->db->query("DESCRIBE ".$this->CI->db->dbprefix($this->_tableName));
+		$colsName = array();
+		foreach ($query->result() as $row) {
+			array_push($colsName,$row->Field);
+		}
+		foreach ($data as $key => $value) {
+			if ( ! in_array($key, $colsName))
+			{
+				unset($data[$key]);
+			}
+		}
+		/* return */
+		return $data;
+	}
 	/**
 	 * Public method
 	 */
@@ -795,7 +815,12 @@ class CRUD {
 	 */
 	public function action_create($data)
 	{
-		
+		self::trim_input_data($data);
+		$this->CI->db->insert(
+			$this->_tableName,
+			$data
+		);
+		return $this->CI->db->insert_id();
 	}
 	/**
 	 * Update an object 
@@ -804,7 +829,27 @@ class CRUD {
 	 */
 	public function action_update($data)
 	{
+		self::trim_input_data($data);
+		if ( $this->_primaryCol == NULL ) {
+			/* get primary key */
+			foreach ($this->_definitions as $colName => $colDefine) {
+				if($colDefine['primary'] == TRUE)
+				{
+					$this->_primaryCol = $colName;
+					break;
+				}
+			}
+		}
+		$id = $data[$this->_primaryCol];
+		$this->CI->db->where($this->_primaryCol,$id);
+		unset($data[$this->_primaryCol]);
 		
+		$this->CI->db->update(
+			$this->_tableName,
+			$data
+		);
+		
+		return $id;
 	}
 	/**
 	 * Delete an object
@@ -813,6 +858,23 @@ class CRUD {
 	 */
 	public function action_delete($data)
 	{
-		
+		self::trim_input_data($data);
+		if ( $this->_primaryCol == NULL ) {
+			/* get primary key */
+			/* get primary key */
+			foreach ($this->_definitions as $colName => $colDefine) {
+				if($colDefine['primary'] == TRUE)
+				{
+					$this->_primaryCol = $colName;
+					break;
+				}
+			}
+		}
+		$this->CI->db->delete(
+			$this->_tableName, 
+			array($this->_primaryCol => $data[$this->_primaryCol])
+		);
+
+		return $this->CI->db->affected_rows();
 	}
 }
