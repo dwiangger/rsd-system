@@ -1,12 +1,45 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Project extends CI_Controller {
+	/* mapping for generate CRUD */
+	var $_definition;
+	
 	function __construct()
 	{
 		parent::__construct();
 		//For dev debug
 		//$this->output->enable_profiler(TRUE);
 		$this->load->library('auth/authentication');
+		$this->load->library('crudlib/crud');
+		
+		$this->crud->TableName("projects");
+		
+		$this->crud->Option("navLink",
+			$this->config->item('base_url')."index.php/project/view_list/{page-index}");
+		$this->crud->Option("editLink",
+			$this->config->item('base_url')."index.php/project/view_edit/{item-index}");
+		$this->crud->Option("confirmDeleteLink",
+			$this->config->item('base_url')."index.php/project/view_confirm/{item-index}");
+		
+		$this->crud->ColumnDefine(array(
+			'id' => array(
+				'display' => FALSE,
+				'primary' => TRUE
+			),
+			'name' => array(
+				'display' => TRUE, 
+				'header' => "Name"
+			),
+			'description'=>array(
+				'display' => TRUE,
+				'header' => "Description",
+				'inputType' => 'textarea',
+				'inputData' => array(
+					'value' => 'team desc',
+					'description' => 'Team description'
+				)
+			)
+		));
 	}
 	public function index($projectId = 0)
 	{
@@ -82,19 +115,45 @@ class Project extends CI_Controller {
 			'_content','project_view',$data);
 		$this->template->render();
 	}
+
+	public function view_list($page = 1)
+	{
+		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		$this->crud->PageIndex($page);
+		$data = $this->crud->render_list();
+		
+		/* Result */
+		$this->template->write_view(
+			'_navigation',
+			'template/navigation',array());
+		$this->template->write(
+			'_content',
+			$data);
+		$this->template->render();
+	}
+	
+	public function view_detail()
+	{
+		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+	}
 	/**
 	 * Display update form 
 	 */
-	public function edit()
+	public function view_edit()
 	{
-		$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+	}
+	
+	public function view_confirm()
+	{
+		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 	}
 	/**
 	 * Perform updating
 	 */
 	public function update()
 	{
-		$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 	}
 }
 ?>

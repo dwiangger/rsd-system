@@ -26,6 +26,10 @@ class CRUD {
 		$this->CI->load->database();
 		$this->_requiredAttribute = 'required="required"';
 		$this->_primaryCol = NULL;
+		$this->_options["render-by-data-type"] = TRUE;
+		$this->_options["indexColumn"] = TRUE;
+		$this->_pageSize = 10;
+		$this->_pageIndex = 1;
 		
 		log_message('debug', "crudlib/CRUD Class Initialized");
 	}
