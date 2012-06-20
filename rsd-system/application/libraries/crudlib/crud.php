@@ -321,7 +321,9 @@ class CRUD {
 				$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
 					.($isRequired?$this->_requiredAttribute:'').">\n";
 				foreach ($refValue as $key => $value) {
-					$result .= "\t\t\t<option value=\"$key\">$value</option>\n";
+					$result .= "\t\t\t<option value=\"$key\" "
+						.((isset($data[$colName])&&$data[$colName]==$key)?' selected="selected" ':'')
+						.">$value</option>\n";
 				}
 				$result .= "\t\t</select>\n";
 			}else 
@@ -359,6 +361,7 @@ class CRUD {
 							."rows=\"3\" "
 							."style=\"resize:none;\" "
 							.($isRequired?$this->_requiredAttribute:'').">"
+							.(isset($data[$colName])?$data[$colName]:'')
 							."</textarea>\n";
 						break;
 					case "checkbox":
@@ -368,13 +371,16 @@ class CRUD {
 							."id=\"$colName\" "
 							."name=\"$colName\" "
 							."value=\"".$this->_definitions[$colName]['inputData']['value']."\""
+							.((isset($data[$colName])&&$data[$colName]==$this->_definitions[$colName]['inputData']['value'])?' checked="checked" ':'')
 							."> ".$this->_definitions[$colName]['inputData']['description']."</label>\n";
 						break;
 					case "select":
 						$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
 							.($isRequired?$this->_requiredAttribute:'').">\n";
 						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
-							$result .= "\t\t\t<option value=\"$value\">$description</option>\n";
+							$result .= "\t\t\t<option value=\"$value\""
+								.((isset($data[$colName])&&$data[$colName]==$value)?' selected="selected" ':'')
+								.">$description</option>\n";
 						}
 						$result .= "\t\t</select>\n";
 						break;
@@ -382,7 +388,9 @@ class CRUD {
 						$result .= "\t\t<select multiple=\"multiple\" name=\"$colName\" id=\"$colName\" "
 							.($isRequired?$this->_requiredAttribute:'').">\n";
 						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
-							$result .= "\t\t\t<option value=\"$value\">$description</option>\n";
+							$result .= "\t\t\t<option value=\"$value\""
+								.((isset($data[$colName])&&$data[$colName]==$value)?' selected="selected" ':'')
+								.">$description</option>\n";
 						}
 						$result .= "\t\t</select>\n";
 						break;
@@ -391,7 +399,9 @@ class CRUD {
 							$result .= "\t\t<label class=\"radio\">"
 								."<input name=\"$colName\" id=\"$colName\" "
 									."value=\"$value\" type=\"radio\" "
-									.($isRequired?$this->_requiredAttribute:'')."> $description\n";
+									.($isRequired?$this->_requiredAttribute:'').""
+									.((isset($data[$colName])&&$data[$colName]==$value)?' selected="selected" ':'')
+									."> $description\n";
 						}
 						break;
 					/* Default: based on data type: 
@@ -415,7 +425,9 @@ class CRUD {
 								."class=\"input-xlarge\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
-								.($isRequired?$this->_requiredAttribute:'').">\n";
+								.($isRequired?$this->_requiredAttribute:'')." "
+								."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
+								.">\n";
 						}else if ( strpos($colDefine['type'], 'text') === 0 )// text
 						{
 							$result .= "\t<textarea class=\"input-xlarge\" "
@@ -424,6 +436,7 @@ class CRUD {
 								."rows=\"3\" "
 								."style=\"resize:none;\" "
 								.($isRequired?$this->_requiredAttribute:'')." >"
+								.(isset($data[$colName])?$data[$colName]:'')
 								."</textarea>\n";
 						}else if ( strpos($colDefine['type'], 'enum') === 0 )// enum
 						{
@@ -435,7 +448,9 @@ class CRUD {
 								.($isRequired?$this->_requiredAttribute:'').">\n";
 							foreach ($optList as $opt ) {
 								$opt = substr($opt, 1, strlen($opt)-2);
-								$result .= "\t\t\t<option value=\"$opt\">$opt</option>\n";
+								$result .= "\t\t\t<option value=\"$opt\" "
+									.((isset($data[$colName])&&$data[$colName]==$opt)?' selected="selected" ':'')
+									.">$opt</option>\n";
 							}
 							$result .= "\t\t</select>\n";
 						}else if ( strpos($colDefine['type'], 'int') === 0 )// int
@@ -444,7 +459,9 @@ class CRUD {
 								."class=\"input-xlarge\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
-								.($isRequired?$this->_requiredAttribute:'').">\n";
+								.($isRequired?$this->_requiredAttribute:'')." "
+								."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
+								." >\n";
 						}else if ( strpos($colDefine['type'], 'decimal') === 0
 							|| strpos($colDefine['type'], 'float') === 0
 							|| strpos($colDefine['type'], 'double') === 0  
@@ -457,7 +474,9 @@ class CRUD {
 								."class=\"input-xlarge\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
-								.($isRequired?$this->_requiredAttribute:'').">\n";
+								.($isRequired?$this->_requiredAttribute:'')." "
+								."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
+								.">\n";
 						}
 						break;
 					/* all these type will be handle as default textbox */
@@ -468,7 +487,9 @@ class CRUD {
 							."class=\"input-xlarge\" "
 							."id=\"$colName\" "
 							."name=\"$colName\" "
-							.($isRequired?$this->_requiredAttribute:'').">\n";
+							.($isRequired?$this->_requiredAttribute:'')." "
+							."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
+							.">\n";
 						break;
 				}
 			}
@@ -479,7 +500,7 @@ class CRUD {
 		/* button area */
     	$result .= "\t</fieldset>\n"
     		."\t<div class=\"form-actions\">\n"
-    		."\t\t<a class=\"btn btn-primary\" href=\"#\"><i class=\"icon-file icon-white\"></i> Create</a>\n"
+    		."\t\t<button class=\"btn btn-primary\" href=\"#\"><i class=\"icon-file icon-white\"></i> Create</button>\n"
 			."\t\t<a class=\"btn\" href=\"#\">Cancel</a>\n"
     		."\t</div>\n"
 			."</form></div><!-- crud-create-form -->\n";
