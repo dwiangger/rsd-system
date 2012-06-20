@@ -237,6 +237,11 @@ class CRUD {
 		/*
 		 * NOTE: only allow 1-chain-reference-column. 
 		 */
+		/*
+		 * With reference column, 
+		 * Render detail form not using display text to compare value, but using reference_id value, 
+		 * So Object received without display text but reference id. 
+		 */
 		/* Initial result string */
 		$result = "";
 		/* Initial render-by-data-type option */
@@ -721,9 +726,46 @@ class CRUD {
 	
 	public function render_editForm()
 	{
-		$data = array();
+		/*
+		 * With reference column, 
+		 * Render edit not using display text to compare, but using reference_id value, 
+		 * So needn't to join. Object pass without text but reference id. 
+		 */
+		/* Copy from render_detail, get object */
+		$this->CI->db->from($this->_tableName);
+		
+		/* Loop through _definitions to find primary key */
+		foreach ($this->_definitions as $colName => $colDefine) {
+			/* get primary key from _definitions to use in where clause */
+			if (isset($colDefine['primary']) 
+				&& $colDefine['primary'] )
+				{
+					$this->_primaryCol = $colName;
+					break;
+				}
+		}
+		/* Add general info & query */
+		$this->CI->db->where(
+			$this->_tableName.".".$this->_primaryCol,
+			$this->_itemId);
+		$this->CI->db->limit(1);
+		$query = $this->CI->db
+			->get();
+		if ($query->num_rows() != 1) {
+			/* Item is not found */
+			return NULL;
+		}
+		$row = $query->row();
+		/* build up result object as an array */
+		$result = array();
+		foreach ($this->_definitions as $colName => $colDefine) {
+			if ($colDefine['display']) {
+				$result[$colName] = $row->$colName;
+			}
+		}
+		/* finish copying */
 		$action = "";
 		
-		return self::print_detail_form($data,$action);
+		return self::print_detail_form($result,$action);
 	}	
 }

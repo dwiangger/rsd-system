@@ -75,7 +75,7 @@ class Welcome extends CI_Controller {
 		$rsl = TRUE;
 		
 		/* Attack */
-		$this->crud->TableName("projects");
+		$this->crud->TableName("teams");
 		$this->crud->Option("render-by-data-type",TRUE);
 		
 		$this->crud->ColumnDefine(array(
@@ -95,7 +95,7 @@ class Welcome extends CI_Controller {
 					'value' => 'team desc',
 					'description' => 'Team description'
 				)
-			)/*,
+			),
 			'project_id' => array(
 				'display' => TRUE,
 				'header' => "Project",
@@ -111,7 +111,7 @@ class Welcome extends CI_Controller {
 						)
 					)
 				)
-			)*/
+			)
 		));
 		/* list */ 
 		$this->crud->Option("indexColumn",TRUE);
@@ -126,7 +126,7 @@ class Welcome extends CI_Controller {
 		/* detail */
 		$this->crud->ItemId(1);
 		/* */
-		$data = $this->crud->render_detail();
+		$data = $this->crud->render_editForm();
 		//$data = $this->crud->render_createForm();
 		
 		/* Result */
