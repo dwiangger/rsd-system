@@ -748,4 +748,12 @@ class CRUD {
 		
 		return self::print_detail_form($data,$action);
 	}
+	
+	public function render_editForm()
+	{
+		$data = array();
+		$action = "";
+		
+		return self::print_detail_form($data,$action);
+	}	
 }
