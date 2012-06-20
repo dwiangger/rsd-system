@@ -158,13 +158,13 @@ class CRUD {
 				if (isset($this->_options['editLink']))
 				{
 					$result .= "\t\t\t\t<li><a href=\""
-						.$this->_options['editLink']
+						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_options['editLink'])
 						."\"><i class=\"icon-pencil\"></i> Edit</a></li>\n";
 				}
 				if (isset($this->_options['confirmDeleteLink']))
 				{
 					$result .= "\t\t\t\t<li><a href=\""
-						.$this->_options['confirmDeleteLink']
+						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_options['confirmDeleteLink'])
 						."\"><i class=\"icon-trash\"></i> Delete</a></li>\n";
 				}
 				$result .= "\t\t\t</ul>\n\t\t</div></td>";
@@ -696,7 +696,8 @@ class CRUD {
 		foreach ($query->result() as $row) {
 			$item = array();
 			foreach ($this->_definitions as $colName => $colDefine) {
-				if ( $colDefine["display"] )
+				if ( $colDefine["display"] 
+					|| $colName == $this->_primaryCol )
 				{
 					$item[$colName] = $row->$colName;
 				}
