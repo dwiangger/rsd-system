@@ -132,7 +132,7 @@ class CRUD {
 				if (isset($this->_options['detailLink']))
 				{
 					$result .= "\t\t\t\t<li><a href=\""
-						.$this->_options['confirmDeleteLink']
+						.$this->_options['detailLink']
 						."\"><i class=\"icon-info-sign\"></i> Detail</a></li>\n";
 					if (isset($this->_options['editLink'])
 						|| isset($this->_options['confirmDeleteLink']) )

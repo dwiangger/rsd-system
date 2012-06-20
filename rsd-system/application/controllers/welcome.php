@@ -75,7 +75,7 @@ class Welcome extends CI_Controller {
 		$rsl = TRUE;
 		
 		/* Attack */
-		$this->crud->TableName("temp");
+		$this->crud->TableName("projects");
 		$this->crud->Option("render-by-data-type",TRUE);
 		/* 
 		$this->crud->ColumnDefine(array(
