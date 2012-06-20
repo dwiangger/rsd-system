@@ -139,12 +139,12 @@ class Project extends CI_Controller {
 	/**
 	 * Display update form 
 	 */
-	public function view_edit()
+	public function view_edit($id)
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 	}
 	
-	public function view_confirm()
+	public function view_confirm($id)
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 	}
