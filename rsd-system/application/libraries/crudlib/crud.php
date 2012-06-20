@@ -1,8 +1,17 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * 
+ * CRUD library 
  * @author thien.an
- *
+ * Provide 5 views 
+ * 	- detail 
+ * 	- list 
+ * 	- update form 
+ * 	- create form 
+ * 	- delete confirmation 
+ * 3 actions 
+ * 	- create 
+ * 	- update 
+ * 	- delete 
  */
 class CRUD {
 	/**
@@ -633,7 +642,10 @@ class CRUD {
 		return $this->_itemId;
 	}
 	/**
-	 * Render list view to a string as a specific $type   
+	 * 5 view function
+	 */
+	/**
+	 * return html code of list view   
 	 */
 	public function render_list($type = "html")
 	{
@@ -671,7 +683,7 @@ class CRUD {
 		return self::print_list_html($result);
 	}
 	/**
-	 * Render detail view to a string 
+	 * return html code of detail view
 	 */
 	public function render_detail()
 	{
@@ -715,7 +727,9 @@ class CRUD {
 		
 		return $result;
 	}
-	
+	/**
+	 * Return html code of create form
+	 */
 	public function render_createForm()
 	{
 		$data = array();
@@ -723,7 +737,9 @@ class CRUD {
 		
 		return self::print_detail_form($data,$action);
 	}
-	
+	/**
+	 * Return html codo of edit form. 
+	 */
 	public function render_editForm()
 	{
 		/*
@@ -767,5 +783,36 @@ class CRUD {
 		$action = "";
 		
 		return self::print_detail_form($result,$action);
-	}	
+	}
+	/**
+	 * 3 action function 
+	 * for all 3 actions, $data array( $colName => $value )  
+	 */	
+	/**
+	 * Create/insert new object
+	 * $data[$primaryKey] is wasted
+	 * $data[$else] is required 
+	 */
+	public function action_create($data)
+	{
+		
+	}
+	/**
+	 * Update an object 
+	 * $data[$primaryKey] is required
+	 * $data[$else] is optional  
+	 */
+	public function action_update($data)
+	{
+		
+	}
+	/**
+	 * Delete an object
+	 * $data[$primaryKey] is required
+	 * $data[$else] is wasted
+	 */
+	public function action_delete($data)
+	{
+		
+	}
 }
