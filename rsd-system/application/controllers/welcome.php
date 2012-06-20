@@ -77,7 +77,7 @@ class Welcome extends CI_Controller {
 		/* Attack */
 		$this->crud->TableName("projects");
 		$this->crud->Option("render-by-data-type",TRUE);
-		/* 
+		
 		$this->crud->ColumnDefine(array(
 			'id' => array(
 				'display' => FALSE,
@@ -95,7 +95,7 @@ class Welcome extends CI_Controller {
 					'value' => 'team desc',
 					'description' => 'Team description'
 				)
-			),
+			)/*,
 			'project_id' => array(
 				'display' => TRUE,
 				'header' => "Project",
@@ -111,23 +111,23 @@ class Welcome extends CI_Controller {
 						)
 					)
 				)
-			)
+			)*/
 		));
-		/* list 
+		/* list */ 
 		$this->crud->Option("indexColumn",TRUE);
 		$this->crud->Option("navLink",
 			$this->config->item('base_url')."index.php/welcome/test/{page-index}");
-		//$this->crud->Option("editLink",
-		//	$this->config->item('base_url')."index.php/welcome/edit/{item-index}");
+		$this->crud->Option("editLink",
+			$this->config->item('base_url')."index.php/welcome/edit/{item-index}");
 		$this->crud->Option("confirmDeleteLink",
 			$this->config->item('base_url')."index.php/welcome/delete/{item-index}");
 		$this->crud->PageSize(10);
 		$this->crud->PageIndex($page);
-		/* detail 
+		/* detail */
 		$this->crud->ItemId(1);
 		/* */
-		//$data = $this->crud->render_detail();
-		 $data = $this->crud->render_createForm();
+		$data = $this->crud->render_detail();
+		//$data = $this->crud->render_createForm();
 		
 		/* Result */
 		$this->template->write_view(

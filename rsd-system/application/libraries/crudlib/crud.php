@@ -53,6 +53,7 @@ class CRUD {
 	/**
 	 * Variable for detail
 	 */
+	var $_primaryCol;
 	var $_itemId;
 	/**
 	 * Variable for new/edit form
@@ -508,6 +509,66 @@ class CRUD {
 		return $result;
 	}
 	
+	private function prepare_query()
+	{
+		$primaryCol = "";// primary column, just accept one, store in property
+		$selectList = array($this->_tableName.".*");// list of column need select from many tables, return result of this function
+		
+		$i = 0;// counter to avoid ambiguous column name 
+		$this->CI->db->from($this->_tableName);
+		
+		/* Loop through _definitions to build up query: join */
+		foreach ($this->_definitions as $colName => $colDefine) {
+			/* get primary key from _definitions to use in where clause */
+			if (isset($colDefine['primary']) 
+				&& $colDefine['primary'] )
+				{
+					$primaryCol = $colName;
+				}
+			/* Add a join clause if this column is reference to another column */
+			if (isset($colDefine['ref']) 
+				&& count($colDefine['ref']) > 0 ) {
+				/* join and add to select list */
+					$displayCol = $colDefine['ref']['displayCol'];
+					
+					$chains = $colDefine['ref']['chain'];
+					
+					$prevTable = $this->_tableName;
+					$prevCol = $colName;
+					$currChain = $colDefine['ref']['firstChain']; 
+					/* join through all chain */
+					while(TRUE)
+					{
+						$chain = $chains[$currChain];
+						$indexCol = $chain['indexCol'];
+						
+						/* Join */
+						/*
+						 * add dbprefix() to avoid CI auto add dbprefix to alias on join/join-condition clause 
+						 */
+						$this->CI->db->join("$currChain AS ".$this->CI->db->dbprefix($currChain.$i),
+							"$prevTable.$prevCol=".$this->CI->db->dbprefix($currChain.$i).".$indexCol");
+						/* Checking last chain */
+						if ( $currChain == $colDefine['ref']['lastChain'] )
+						{
+							/* Add to selecting list */
+							array_push($selectList,"$currChain$i.$displayCol AS $colName");
+							break;
+						}
+						/* prepare for next loop */
+						$prevTable = $currChain.$i;
+						$prevCol = $chain['refCol'];
+						$currChain = $chain['nextChain'];
+					}
+					$i++;
+			}
+		}
+		/* Push primaryCol to property */
+		$this->_primaryCol = $primaryCol;
+		/* Return selectList */ 
+		return $selectList;
+	}
+	
 	/**
 	 * Public method
 	 */
@@ -576,52 +637,7 @@ class CRUD {
 		 * 2. get page of results.
 		 */
 		$this->CI->db->start_cache();
-		$this->CI->db->from($this->_tableName);
-		
-		$i = 0;
-		$selectList = array($this->_tableName.".*");
-			foreach ($this->_definitions as $colName => $colDefine) {
-			/* get primary key from _definitions to use in where clause */
-			if (isset($colDefine['primary']) 
-				&& $colDefine['primary'] )
-				{
-					$primaryCol = $colName;
-				}
-			/* Add a join clause if this column is reference to another column */
-			if (isset($colDefine['ref']) 
-				&& count($colDefine['ref']) > 0 ) {
-				/* join and add to select list */
-					$displayCol = $colDefine['ref']['displayCol'];
-					
-					$chains = $colDefine['ref']['chain'];
-					
-					$prevTable = $this->_tableName;
-					$prevCol = $colName;
-					$currChain = $colDefine['ref']['firstChain']; 
-					/* join through all chain */
-					while(TRUE)
-					{
-						$chain = $chains[$currChain];
-						$indexCol = $chain['indexCol'];
-						
-						/* Join */
-						$this->CI->db->join("$currChain AS $currChain$i",
-							"$prevTable.$prevCol=$currChain$i.$indexCol");
-						/* Checking last chain */
-						if ( $currChain == $colDefine['ref']['lastChain'] )
-						{
-							/* Add to selecting list */
-							array_push($selectList,"$currChain$i.$displayCol AS $colName");
-							break;
-						}
-						/* prepare for next loop */
-						$prevTable = $currChain.$i;
-						$prevCol = $chain['refCol'];
-						$currChain = $chain['nextChain'];
-					}
-					$i++;
-			}
-		}
+		$selectList = self::prepare_query();
 		$this->CI->db->stop_cache();
 		
 		/* Get count of all result */
@@ -654,57 +670,11 @@ class CRUD {
 	 */
 	public function render_detail()
 	{
-		/* primary column, just accept one */
-		$primaryCol = "";
-		$i = 0;// counter to avoid ambiguous column name 
-		$selectList = array($this->_tableName.".*");// list of column need select from many tables 
-		$this->CI->db->from($this->_tableName);
-		
-		/* Loop through _definitions to build up query: join */
-		foreach ($this->_definitions as $colName => $colDefine) {
-			/* get primary key from _definitions to use in where clause */
-			if (isset($colDefine['primary']) 
-				&& $colDefine['primary'] )
-				{
-					$primaryCol = $colName;
-				}
-			/* Add a join clause if this column is reference to another column */
-			if (isset($colDefine['ref']) 
-				&& count($colDefine['ref']) > 0 ) {
-				/* join and add to select list */
-					$displayCol = $colDefine['ref']['displayCol'];
-					
-					$chains = $colDefine['ref']['chain'];
-					
-					$prevTable = $this->_tableName;
-					$prevCol = $colName;
-					$currChain = $colDefine['ref']['firstChain']; 
-					/* join through all chain */
-					while(TRUE)
-					{
-						$chain = $chains[$currChain];
-						$indexCol = $chain['indexCol'];
-						
-						/* Join */
-						$this->CI->db->join("$currChain AS $currChain$i",
-							"$prevTable.$prevCol=$currChain$i.$indexCol");
-						/* Checking last chain */
-						if ( $currChain == $colDefine['ref']['lastChain'] )
-						{
-							/* Add to selecting list */
-							array_push($selectList,"$currChain$i.$displayCol AS $colName");
-							break;
-						}
-						/* prepare for next loop */
-						$prevTable = $currChain.$i;
-						$prevCol = $chain['refCol'];
-						$currChain = $chain['nextChain'];
-					}
-					$i++;
-			}
-		}
+		$selectList = self::prepare_query();
 		/* Add general info & query */
-		$this->CI->db->where($this->_tableName.".".$primaryCol,$this->_itemId);
+		$this->CI->db->where(
+			$this->_tableName.".".$this->_primaryCol,
+			$this->_itemId);
 		$this->CI->db->limit(1);
 		$this->CI->db->select(implode(",", $selectList));
 		$query = $this->CI->db
