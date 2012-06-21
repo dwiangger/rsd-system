@@ -132,21 +132,66 @@ class Project extends CI_Controller {
 		$this->template->render();
 	}
 	
-	public function view_detail()
+	public function view_detail($id = 0)
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		$this->crud->ItemId($id);
+		$data = $this->crud->render_detail();
+		
+		if ($data == NULL)
+		{
+			show_404($this->uri->uri_string(),FALSE);
+		}
+		/* Result */
+		$this->template->write_view(
+			'_navigation',
+			'template/navigation',array());
+		$this->template->write(
+			'_content',
+			$data);
+		$this->template->render();
 	}
 	/**
 	 * Display update form 
 	 */
-	public function view_edit($id)
+	public function view_edit($id = 0)
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		$this->crud->ItemId($id);
+		$data = $this->crud->render_editForm();
+		
+		if ($data == NULL)
+		{
+			show_404($this->uri->uri_string(),FALSE);
+		}
+		/* Result */
+		$this->template->write_view(
+			'_navigation',
+			'template/navigation',array());
+		$this->template->write(
+			'_content',
+			$data);
+		$this->template->render();
 	}
 	
-	public function view_confirm($id)
+	public function view_confirm($id = 0)
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		$this->crud->ItemId($id);
+		$data = $this->crud->render_confirmDelete();
+		
+		if ($data == NULL)
+		{
+			show_404($this->uri->uri_string(),FALSE);
+		}
+		/* Result */
+		$this->template->write_view(
+			'_navigation',
+			'template/navigation',array());
+		$this->template->write(
+			'_content',
+			$data);
+		$this->template->render();
 	}
 	/**
 	 * Perform updating
