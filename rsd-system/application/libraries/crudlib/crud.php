@@ -246,7 +246,10 @@ class CRUD {
 		return $result;
 	}
 	
-	private function print_detail_form($data, $action)
+	private function print_detail_form(
+		$data, /* Data object */ 
+		$action, /* form action */
+		$title = 'Create new <strong>{item}</strong>') /* "{item}" will be replaced by object name */
 	{
 		/*
 		 * NOTE: only allow 1-chain-reference-column. 
@@ -282,7 +285,7 @@ class CRUD {
 		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\" "
 			."method=\"post\" action=\"$action\">\n"
     		."\t<fieldset>\n"
-    		."\t\t<legend>Create new <strong>{item}</strong>:</legend>\n";
+    		."\t\t<legend>$title</legend>\n";
     	/* Loop all field to generate input element */
 		foreach ($tableInfo as $colName => $colDefine) {
 			if ( strpos($colDefine['extra'],'auto_increment') !== FALSE )
@@ -807,7 +810,7 @@ class CRUD {
 		/* finish copying */
 		$action = "";
 		
-		return self::print_detail_form($result,$action);
+		return self::print_detail_form($result,$action,'Edit <strong>{item}</strong>:');
 	}
 	/**
 	 * 3 action function 
