@@ -523,7 +523,7 @@ class CRUD {
 		/* button area */
     	$result .= "\t</fieldset>\n"
     		."\t<div class=\"form-actions\">\n"
-    		."\t\t<button class=\"btn btn-primary\" href=\"#\"><i class=\"icon-file icon-white\"></i> Create</button>\n"
+    		."\t\t<button class=\"btn btn-primary\" ><i class=\"icon-file icon-white\"></i> Create</button>\n"
 			."\t\t<a class=\"btn\" href=\""
 			.(isset($this->_options['navLink'])?str_replace('{page-index}','', $this->_options['navLink']):'#')
 			."\">Cancel</a>\n"
@@ -745,7 +745,9 @@ class CRUD {
 			."\t<div class=\"row\"><div class=\"span6\">Are you sure you want to delete <strong>{item}</strong> ?</div></div>\n"
 			."<br />"
 			."\t<div class=\"row\"><div class=\"span6\">"
-				."<a class=\"btn btn-danger\" href=\"#\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n"
+				."<a class=\"btn btn-danger\" href=\""
+				.(isset($this->_options['deleteActionLink'])?str_replace('{item-index}',$this->_itemId, $this->_options['deleteActionLink']):'#')
+				."\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n"
 				."<a class=\"btn\" href=\""
 				.(isset($this->_options['navLink'])?str_replace('{page-index}','', $this->_options['navLink']):'#')
 				."\">Cancel</a>"
@@ -812,6 +814,10 @@ class CRUD {
 		}
 		/* finish copying */
 		$action = "";
+		if (isset($this->_options['updateActionLink']))
+		{
+			$action = $this->_options['updateActionLink']."/".$this->_itemId;
+		}
 		
 		return self::print_detail_form($result,$action,'Edit <strong>{item}</strong>:');
 	}
@@ -857,7 +863,8 @@ class CRUD {
 				}
 			}
 		}
-		$id = $data[$this->_primaryCol];
+		/* use $this->_itemId instead store in $data, will consire using both 2 */
+		$id = $this->_itemId;
 		$this->CI->db->where($this->_primaryCol,$id);
 		unset($data[$this->_primaryCol]);
 		
@@ -873,7 +880,7 @@ class CRUD {
 	 * $data[$primaryKey] is required
 	 * $data[$else] is wasted
 	 */
-	public function action_delete()
+	public function action_delete($data = NULL)
 	{
 		if ( $data == NULL )
 		{
@@ -891,7 +898,8 @@ class CRUD {
 		}
 		$this->CI->db->delete(
 			$this->_tableName, 
-			array($this->_primaryCol => $data[$this->_primaryCol])
+			array($this->_primaryCol => $this->_itemId) 
+			/* the same as using primary keys in editing, will use in both 2 ways */
 		);
 
 		return $this->CI->db->affected_rows();
