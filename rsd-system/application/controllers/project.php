@@ -161,6 +161,9 @@ class Project extends CI_Controller {
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 		$this->crud->ItemId($id);
+		$this->crud->Option('updateActionLink',
+			site_url('/project/update')
+		);
 		$data = $this->crud->render_editForm();
 		
 		if ($data == NULL)
@@ -181,6 +184,9 @@ class Project extends CI_Controller {
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 		$this->crud->ItemId($id);
+		$this->crud->Option('deleteActionLink',
+			site_url('/project/delete/{item-index}')
+		);		
 		$data = $this->crud->render_confirmDelete();
 		
 		if ($data == NULL)
@@ -230,8 +236,11 @@ class Project extends CI_Controller {
 	public function update($id = 0)
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
-		echo "Reached me :)";
-		die();
+		$this->crud->ItemId($id);
+		$this->crud->action_update();
+
+		redirect('/project/view_detail/'.$id, 'refresh');
+
 	}
 	/**
 	 * Perform delete
@@ -239,6 +248,10 @@ class Project extends CI_Controller {
 	public function delete($id = 0)
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		$this->crud->ItemId($id);
+		$this->crud->action_delete();
+		
+		redirect('/project/view_list/', 'refresh');
 	}
 }
 ?>
