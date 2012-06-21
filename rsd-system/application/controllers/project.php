@@ -120,6 +120,9 @@ class Project extends CI_Controller {
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 		$this->crud->PageIndex($page);
+				$this->crud->Option("detailLink",
+			$this->config->item('base_url')."index.php/project/view_detail/{item-index}");
+		
 		$data = $this->crud->render_list();
 		
 		/* Result */
@@ -193,10 +196,47 @@ class Project extends CI_Controller {
 			$data);
 		$this->template->render();
 	}
+	
+	public function view_create()
+	{
+		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		$this->crud->Option('createActionLink',
+			site_url('/project/create')
+		);
+		$data = $this->crud->render_createForm();
+
+		/* Result */
+		$this->template->write_view(
+			'_navigation',
+			'template/navigation',array());
+		$this->template->write(
+			'_content',
+			$data);
+		$this->template->render();
+	}
+	/**
+	 * Perform create
+	 */
+	public function create()
+	{
+		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		$id = $this->crud->action_create();
+
+		redirect('/project/view_detail/'.$id, 'refresh');
+	}
 	/**
 	 * Perform updating
 	 */
-	public function update()
+	public function update($id = 0)
+	{
+		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
+		echo "Reached me :)";
+		die();
+	}
+	/**
+	 * Perform delete
+	 */
+	public function delete($id = 0)
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 	}

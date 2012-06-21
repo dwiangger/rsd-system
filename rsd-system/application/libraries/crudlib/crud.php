@@ -147,7 +147,7 @@ class CRUD {
 				if (isset($this->_options['detailLink']))
 				{
 					$result .= "\t\t\t\t<li><a href=\""
-						.$this->_options['detailLink']
+						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_options['detailLink'])
 						."\"><i class=\"icon-info-sign\"></i> Detail</a></li>\n";
 					if (isset($this->_options['editLink'])
 						|| isset($this->_options['confirmDeleteLink']) )
@@ -231,13 +231,13 @@ class CRUD {
 				if ( isset($this->_options['editLink']) )
 				{
 					$result .= "\t<a class=\"btn btn-info\" href=\""
-						.$this->_options['editLink']
+						.str_replace('{item-index}', $this->_itemId, $this->_options['editLink'])
 						."\"><i class=\"icon-pencil icon-white\"></i> Edit</a>\n";
 				}
 				if ( isset($this->_options['confirmDeleteLink']) )
 				{
 					$result .= "\t<a class=\"btn btn-danger\" href=\""
-						.$this->_options['confirmDeleteLink']
+						.str_replace('{item-index}', $this->_itemId, $this->_options['confirmDeleteLink'])
 						."\"><i class=\"icon-trash icon-white\"></i> Delete</a></div>\n";
 				}
 				$result .= "</fieldset>\n</form></div><!-- crud-detail-view -->\n";
@@ -524,7 +524,9 @@ class CRUD {
     	$result .= "\t</fieldset>\n"
     		."\t<div class=\"form-actions\">\n"
     		."\t\t<button class=\"btn btn-primary\" href=\"#\"><i class=\"icon-file icon-white\"></i> Create</button>\n"
-			."\t\t<a class=\"btn\" href=\"#\">Cancel</a>\n"
+			."\t\t<a class=\"btn\" href=\""
+			.(isset($this->_options['navLink'])?str_replace('{page-index}','', $this->_options['navLink']):'#')
+			."\">Cancel</a>\n"
     		."\t</div>\n"
 			."</form></div><!-- crud-create-form -->\n";
 		/* return */
@@ -594,18 +596,13 @@ class CRUD {
 	 * Welform input array, remove all item which is not column name
 	 * @param array($colName => $value) $data
 	 */
-	private function trim_input_data($data)
+	private function posted_object_data()
 	{
+		$data = array();
 		$query = $this->CI->db->query("DESCRIBE ".$this->CI->db->dbprefix($this->_tableName));
 		$colsName = array();
 		foreach ($query->result() as $row) {
-			array_push($colsName,$row->Field);
-		}
-		foreach ($data as $key => $value) {
-			if ( ! in_array($key, $colsName))
-			{
-				unset($data[$key]);
-			}
+			$data[$row->Field] = $this->CI->input->post($row->Field);
 		}
 		/* return */
 		return $data;
@@ -749,7 +746,9 @@ class CRUD {
 			."<br />"
 			."\t<div class=\"row\"><div class=\"span6\">"
 				."<a class=\"btn btn-danger\" href=\"#\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n"
-				."<a class=\"btn\" href=\"#\">Cancel</a>"
+				."<a class=\"btn\" href=\""
+				.(isset($this->_options['navLink'])?str_replace('{page-index}','', $this->_options['navLink']):'#')
+				."\">Cancel</a>"
 			."</div></div>\n";
 		$result .= "</div><!-- crud-confirm-delete -->\n";
 		
@@ -762,6 +761,10 @@ class CRUD {
 	{
 		$data = array();
 		$action = "";
+		if (isset($this->_options['createActionLink']))
+		{
+			$action = $this->_options['createActionLink'];
+		}
 		
 		return self::print_detail_form($data,$action);
 	}
@@ -821,9 +824,12 @@ class CRUD {
 	 * $data[$primaryKey] is wasted
 	 * $data[$else] is required 
 	 */
-	public function action_create($data)
+	public function action_create($data = NULL)
 	{
-		self::trim_input_data($data);
+		if( $data == NULL )
+		{
+			$data = self::posted_object_data();
+		}
 		$this->CI->db->insert(
 			$this->_tableName,
 			$data
@@ -835,9 +841,12 @@ class CRUD {
 	 * $data[$primaryKey] is required
 	 * $data[$else] is optional  
 	 */
-	public function action_update($data)
+	public function action_update($data = NULL)
 	{
-		self::trim_input_data($data);
+		if ( $data == NULL )
+		{
+			$data = self::posted_object_data();
+		}
 		if ( $this->_primaryCol == NULL ) {
 			/* get primary key */
 			foreach ($this->_definitions as $colName => $colDefine) {
@@ -864,9 +873,12 @@ class CRUD {
 	 * $data[$primaryKey] is required
 	 * $data[$else] is wasted
 	 */
-	public function action_delete($data)
+	public function action_delete()
 	{
-		self::trim_input_data($data);
+		if ( $data == NULL )
+		{
+			$data = self::posted_object_data();
+		}
 		if ( $this->_primaryCol == NULL ) {
 			/* get primary key */
 			foreach ($this->_definitions as $colName => $colDefine) {
