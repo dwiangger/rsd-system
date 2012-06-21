@@ -866,7 +866,6 @@ class CRUD {
 		self::trim_input_data($data);
 		if ( $this->_primaryCol == NULL ) {
 			/* get primary key */
-			/* get primary key */
 			foreach ($this->_definitions as $colName => $colDefine) {
 				if($colDefine['primary'] == TRUE)
 				{
