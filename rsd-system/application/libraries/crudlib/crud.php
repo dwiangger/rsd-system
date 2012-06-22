@@ -45,17 +45,29 @@ class CRUD {
 	 */
 	var $_tableName;
 	/**
-	 * @var array of option
-	 * 	indexColumn		TRUE/FALSE		show/hide index column in list viewing 
-	 * 	navLink			string			navigation link in list viewing, 
-	 * 									using "{page-index}" present page index.
-	 * 	detailLink		string			link to detail form viewing
-	 * 	confirmDeleleLink		string	link to confirm delete form
-	 * 	deleteLink		string			link to action delete  
-	 * 	editLink		string			link to edit form 
-	 * 	updateLink		string			Link to action update 
+	 * @var array of option<br/>
+	 * 	indexColumn		TRUE/FALSE		show/hide index column in list viewing<br/> 
+	 * 	navLink			string			navigation link in list viewing, <br/>
+	 * 									using "{page-index}" present page index.<br/>
 	 */
-	var $_options; 
+	var $_options;
+	/**
+	 * Contain link to other function<br />
+	 * @var array(<br />
+	 * 	"view_list" =><br />
+	 * 	"view_detail" =><br />
+	 * 	"view_edit" =><br />
+	 * 	"view_confirmDelete" =><br />
+	 * 	"view_create" =><br />
+	 * 	"create" =><br />
+	 * 	"update" =><br />
+	 * 	"delete" =><br />
+	 * ) <br />
+	 */
+	var $_links; 
+	/**
+	 * Define for table 
+	 */
 	var $_definitions;
 	/**
 	 * Variable for viewing list. 
@@ -69,10 +81,6 @@ class CRUD {
 	 */
 	var $_primaryCol;
 	var $_itemId;
-	/**
-	 * Variable for new/edit form
-	 */
-	var $_requiredAttribute;
 	/**
 	 * Local method 
 	 */
@@ -94,9 +102,9 @@ class CRUD {
 		}
 		/* Is editable or deletable - Action column*/
 		$actionColumn = FALSE;
-		if ( isset($this->_options['editLink']) 
-			|| isset($this->_options['confirmDeleteLink'])
-			|| isset($this->_options['detailLink']) )
+		if ( $this->_links['view_edit'] != NULL 
+			|| $this->_links['view_confirmDelete'] != NULL
+			|| $this->_links['view_detail'] != NULL )
 		{
 			$actionColumn = TRUE;
 		}
@@ -144,27 +152,27 @@ class CRUD {
 					."\t\t\t<a class=\"btn btn-mini\" href=\"#\"><i class=\"icon-cog\"></i></a>\n"
 					."\t\t\t<a class=\"btn btn-mini dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\"><span class=\"caret\"></span></a>\n"
 					."\t\t\t<ul class=\"dropdown-menu\">\n";
-				if (isset($this->_options['detailLink']))
+				if ($this->_links['view_detail'] != NULL)
 				{
 					$result .= "\t\t\t\t<li><a href=\""
-						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_options['detailLink'])
+						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_links['view_detail'])
 						."\"><i class=\"icon-info-sign\"></i> Detail</a></li>\n";
-					if (isset($this->_options['editLink'])
-						|| isset($this->_options['confirmDeleteLink']) )
+					if ($this->_links['view_edit'] != NULL
+						|| $this->_links['view_confirmDelete'] != NULL )
 					{
 						$result .= "\t\t\t\t<li class=\"divider\"></li>";
 					}	
 				}
-				if (isset($this->_options['editLink']))
+				if ($this->_links['view_edit'] != NULL)
 				{
 					$result .= "\t\t\t\t<li><a href=\""
-						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_options['editLink'])
+						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_links['view_edit'])
 						."\"><i class=\"icon-pencil\"></i> Edit</a></li>\n";
 				}
-				if (isset($this->_options['confirmDeleteLink']))
+				if ($this->_links['view_confirmDelete'] != NULL)
 				{
 					$result .= "\t\t\t\t<li><a href=\""
-						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_options['confirmDeleteLink'])
+						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_links['view_confirmDelete'])
 						."\"><i class=\"icon-trash\"></i> Delete</a></li>\n";
 				}
 				$result .= "\t\t\t</ul>\n\t\t</div></td>";
@@ -174,7 +182,7 @@ class CRUD {
 		}
 		
 		/* Calculate and Generate navigation link */
-		$navLink = $this->_options["navLink"];
+		$navLink = $this->_links['view_list'];
 		$result .= "\t<tr><td colspan=\"$numRow\">";
 		/* Previous link */
 		if ($this->_pageIndex > 1) {
@@ -224,20 +232,20 @@ class CRUD {
 			}
 		}
 		
-		if (isset($this->_options['confirmDeleteLink'])
-			|| isset($this->_options['editLink']) )
+		if ($this->_links['view_confirmDelete'] != NULL
+			|| $this->_links['view_edit'] != NULL )
 			{
 				$result .= "<div class=\"form-actions\">\n";
-				if ( isset($this->_options['editLink']) )
+				if ( $this->_links['view_edit'] != NULL )
 				{
 					$result .= "\t<a class=\"btn btn-info\" href=\""
-						.str_replace('{item-index}', $this->_itemId, $this->_options['editLink'])
+						.str_replace('{item-index}', $this->_itemId, $this->_links['view_edit'])
 						."\"><i class=\"icon-pencil icon-white\"></i> Edit</a>\n";
 				}
-				if ( isset($this->_options['confirmDeleteLink']) )
+				if ( $this->_links['view_confirmDelete'] != NULL )
 				{
 					$result .= "\t<a class=\"btn btn-danger\" href=\""
-						.str_replace('{item-index}', $this->_itemId, $this->_options['confirmDeleteLink'])
+						.str_replace('{item-index}', $this->_itemId, $this->_links['view_confirmDelete'])
 						."\"><i class=\"icon-trash icon-white\"></i> Delete</a></div>\n";
 				}
 				$result .= "</fieldset>\n</form></div><!-- crud-detail-view -->\n";
@@ -525,7 +533,7 @@ class CRUD {
     		."\t<div class=\"form-actions\">\n"
     		."\t\t<button class=\"btn btn-primary\" ><i class=\"icon-file icon-white\"></i> Create</button>\n"
 			."\t\t<a class=\"btn\" href=\""
-			.(isset($this->_options['navLink'])?str_replace('{page-index}','', $this->_options['navLink']):'#')
+			.(($this->_links['view_list'] != NULL )?str_replace('{page-index}','', $this->_links['view_list']):'#')
 			."\">Cancel</a>\n"
     		."\t</div>\n"
 			."</form></div><!-- crud-create-form -->\n";
@@ -666,6 +674,42 @@ class CRUD {
 		return $this->_itemId;
 	}
 	/**
+	 * function to manage links<br/>
+	 * Accepted name: <br/> 
+	 * "view_list" - Link to list page <br/>
+	 * "view_detail" - Link to detail page <br/>
+	 * "view_edit" - Link to edit form page <br/>
+	 * "view_confirmDelete" - Link to confirm delete page <br/> 
+	 * "view_create" - Link to create form <br/>
+	 * "create" - Link to create action <br/>
+	 * "update" - Link to update action <br/>
+	 * "delete" - Link to delete action <br/>
+	 * <br />
+	 * Add "{page-index}" where need page index. 
+	 * Add "{item-index}" where need item index
+	 */
+	public function Link($name , $value = NULL)
+	{
+		/* Checking $name with defined keys */
+		switch ($name)
+		{
+			case "view_list": 
+			case "view_detail": 
+			case "view_edit": 
+			case "view_confirmDelete": 
+			case "view_create": 
+			case "create": 
+			case "update": 
+			case "delete": 
+				break;
+			default: /* Prevent undefined value */
+				return NULL;
+		}
+		/* set value, value == NULL is unset */
+		$this->_links[$name] = (string)$value;
+		return $this->_links[$name]; 
+	} 
+	/**
 	 * 5 view function
 	 */
 	/**
@@ -746,10 +790,10 @@ class CRUD {
 			."<br />"
 			."\t<div class=\"row\"><div class=\"span6\">"
 				."<a class=\"btn btn-danger\" href=\""
-				.(isset($this->_options['deleteActionLink'])?str_replace('{item-index}',$this->_itemId, $this->_options['deleteActionLink']):'#')
+				.(($this->_links['delete'] != NULL)?str_replace('{item-index}',$this->_itemId, $this->_links['delete']):'#')
 				."\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n"
 				."<a class=\"btn\" href=\""
-				.(isset($this->_options['navLink'])?str_replace('{page-index}','', $this->_options['navLink']):'#')
+				.(($this->_links['view_list'] != NULL)?str_replace('{page-index}','', $this->_links['view_list']):'#')
 				."\">Cancel</a>"
 			."</div></div>\n";
 		$result .= "</div><!-- crud-confirm-delete -->\n";
@@ -763,9 +807,9 @@ class CRUD {
 	{
 		$data = array();
 		$action = "";
-		if (isset($this->_options['createActionLink']))
+		if ($this->_links['create'] != NULL)
 		{
-			$action = $this->_options['createActionLink'];
+			$action = $this->_links['create'];
 		}
 		
 		return self::print_detail_form($data,$action);
@@ -814,9 +858,9 @@ class CRUD {
 		}
 		/* finish copying */
 		$action = "";
-		if (isset($this->_options['updateActionLink']))
+		if ($this->_links['update'] != NULL)
 		{
-			$action = $this->_options['updateActionLink']."/".$this->_itemId;
+			$action = $this->_links['update']."/".$this->_itemId;
 		}
 		
 		return self::print_detail_form($result,$action,'Edit <strong>{item}</strong>:');
