@@ -192,13 +192,12 @@ class CRUD {
 		}
 		
 		/* Calculate and Generate navigation link */
-		$navLink = $this->_links['view_list'];
 		$result .= "\t<tr><td colspan=\"$numRow\">";
 		/* Previous link */
 		if ($this->_pageIndex > 1) {
-			$result .= "<a href=\"".str_replace("{page-index}", "", $navLink)."\" title=\"First page\" class=\"btn btn-mini\">"
+			$result .= "<a href=\"".str_replace("{page-index}", "", $this->_links['view_list'])."\" title=\"First page\" class=\"btn btn-mini\">"
 					."<i class=\"icon-fast-backward\"></i></a>";
-			$result .= "<a href=\"".str_replace("{page-index}", ($this->_pageIndex-1), $navLink)."\" title=\"Previous page\" class=\"btn btn-mini\">"
+			$result .= "<a href=\"".str_replace("{page-index}", ($this->_pageIndex-1), $this->_links['view_list'])."\" title=\"Previous page\" class=\"btn btn-mini\">"
 					."<i class=\"icon-step-backward\"></i></a>";
 		}else 
 		{
@@ -219,9 +218,9 @@ class CRUD {
 					."<i class=\"icon-fast-forward\"></i></a>";
 		}else
 		{
-			$result .= "<a href=\"".str_replace("{page-index}", $this->_pageIndex+1, $navLink)."\" title=\"Next page\" class=\"btn btn-mini\">"
+			$result .= "<a href=\"".str_replace("{page-index}", $this->_pageIndex+1, $this->_links['view_list'])."\" title=\"Next page\" class=\"btn btn-mini\">"
 					."<i class=\"icon-step-forward\"></i></a>"
-				."<a href=\"".str_replace("{page-index}", $totalPage, $navLink)."\" title=\"Last page\" class=\"btn btn-mini\">"
+				."<a href=\"".str_replace("{page-index}", $totalPage, $this->_links['view_list'])."\" title=\"Last page\" class=\"btn btn-mini\">"
 					."<i class=\"icon-fast-forward\"></i></a>";
 		}
 		$result .= "</td></tr>\n"
