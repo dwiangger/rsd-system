@@ -30,7 +30,17 @@ class CRUD {
 		$this->_options["indexColumn"] = TRUE;
 		$this->_pageSize = 10;
 		$this->_pageIndex = 1;
-		
+		/* Default value for links */
+		$this->_links['view_list'] = NULL; 
+		$this->_links['view_detail'] = NULL; 
+		$this->_links['view_edit'] = NULL; 
+		$this->_links['view_confirmDelete'] = NULL; 
+		$this->_links['view_create'] = NULL; 
+		$this->_links['create'] = NULL; 
+		$this->_links['update'] = NULL; 
+		$this->_links['delete'] = NULL;
+
+		/* Inform creating CRUD */
 		log_message('debug', "crudlib/CRUD Class Initialized");
 	}
 	/**
