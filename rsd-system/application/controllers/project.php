@@ -14,11 +14,11 @@ class Project extends CI_Controller {
 		
 		$this->crud->TableName("projects");
 		
-		$this->crud->Option("navLink",
+		$this->crud->Link("view_list",
 			$this->config->item('base_url')."index.php/project/view_list/{page-index}");
-		$this->crud->Option("editLink",
+		$this->crud->Link("view_edit",
 			$this->config->item('base_url')."index.php/project/view_edit/{item-index}");
-		$this->crud->Option("confirmDeleteLink",
+		$this->crud->Link("view_confirmDelete",
 			$this->config->item('base_url')."index.php/project/view_confirm/{item-index}");
 		
 		$this->crud->ColumnDefine(array(
@@ -120,7 +120,7 @@ class Project extends CI_Controller {
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 		$this->crud->PageIndex($page);
-				$this->crud->Option("detailLink",
+				$this->crud->Link("view_detail",
 			$this->config->item('base_url')."index.php/project/view_detail/{item-index}");
 		
 		$data = $this->crud->render_list();
@@ -161,8 +161,8 @@ class Project extends CI_Controller {
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 		$this->crud->ItemId($id);
-		$this->crud->Option('updateActionLink',
-			site_url('/project/update')
+		$this->crud->Link('update',
+			site_url('/project/update/{item-index}')
 		);
 		$data = $this->crud->render_editForm();
 		
@@ -184,7 +184,7 @@ class Project extends CI_Controller {
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
 		$this->crud->ItemId($id);
-		$this->crud->Option('deleteActionLink',
+		$this->crud->Link('delete',
 			site_url('/project/delete/{item-index}')
 		);		
 		$data = $this->crud->render_confirmDelete();
@@ -206,7 +206,7 @@ class Project extends CI_Controller {
 	public function view_create()
 	{
 		//$this->authentication->checkLogin(TRUE,NULL,'authenticate/login');
-		$this->crud->Option('createActionLink',
+		$this->crud->Link('create',
 			site_url('/project/create')
 		);
 		$data = $this->crud->render_createForm();

@@ -115,11 +115,11 @@ class Welcome extends CI_Controller {
 		));
 		/* list */ 
 		$this->crud->Option("indexColumn",TRUE);
-		$this->crud->Option("navLink",
+		$this->crud->Link("view_list",
 			$this->config->item('base_url')."index.php/welcome/test/{page-index}");
-		$this->crud->Option("editLink",
+		$this->crud->Link("view_edit",
 			$this->config->item('base_url')."index.php/welcome/edit/{item-index}");
-		$this->crud->Option("confirmDeleteLink",
+		$this->crud->Link("view_confirmDelete",
 			$this->config->item('base_url')."index.php/welcome/delete/{item-index}");
 		$this->crud->PageSize(10);
 		$this->crud->PageIndex($page);
