@@ -53,12 +53,15 @@ class CRUD {
 	/**
 	 * General variable
 	 */
+	/**
+	 * table name need to handle 
+	 */
 	var $_tableName;
 	/**
 	 * @var array of option<br/>
-	 * 	indexColumn		TRUE/FALSE		show/hide index column in list viewing<br/> 
-	 * 	navLink			string			navigation link in list viewing, <br/>
-	 * 									using "{page-index}" present page index.<br/>
+	 * 	"indexColumn"		TRUE/FALSE		show/hide index column in list viewing<br/> 
+	 * 	"render-by-data-type"		TRUE/FALSE	if definition for rendering is not set, <br/>
+	 * using this option to decide  
 	 */
 	var $_options;
 	/**
@@ -76,21 +79,22 @@ class CRUD {
 	 */
 	var $_links; 
 	/**
-	 * Define for table 
+	 * Define for table. 
+	 * Need expalin more here ! 
 	 */
 	var $_definitions;
 	/**
 	 * Variable for viewing list. 
 	 */
-	var $_query;
-	var $_pageSize;
-	var $_pageIndex; /* count from 1 */
-	var $_totalResults;
+	var $_query; /* Using _query instead _tableName in view */
+	var $_pageSize; /* page size, default 10 */
+	var $_pageIndex; /* current viewing index, count from 1, also default */
+	var $_totalResults; /* total result after query */
 	/**
 	 * Variable for detail
 	 */
-	var $_primaryCol;
-	var $_itemId;
+	var $_primaryCol; /* primary key extracted from _definition */
+	var $_itemId; /* value for primary key when query specific item */
 	/**
 	 * Local method 
 	 */
