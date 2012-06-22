@@ -869,7 +869,7 @@ class CRUD {
 		$action = "";
 		if ($this->_links['update'] != NULL)
 		{
-			$action = $this->_links['update']."/".$this->_itemId;
+			$action = str_replace('{item-index}', $this->_itemId, $this->_links['update']);
 		}
 		
 		return self::print_detail_form($result,$action,'Edit <strong>{item}</strong>:');
