@@ -24,7 +24,8 @@ class CRUD {
 
 		/* load libraries, helpers manually in case not autoload */
 		$this->CI->load->database();
-		$this->_requiredAttribute = 'required="required"';
+
+		/* General default value */ 
 		$this->_primaryCol = NULL;
 		$this->_options["render-by-data-type"] = TRUE;
 		$this->_options["indexColumn"] = TRUE;
@@ -53,6 +54,7 @@ class CRUD {
 	/**
 	 * General variable
 	 */
+	const _REQUIRED_ATTRIBUTE = 'required="required"';
 	/**
 	 * table name need to handle 
 	 */
@@ -80,7 +82,23 @@ class CRUD {
 	var $_links; 
 	/**
 	 * Define for table. 
-	 * Need expalin more here ! 
+	 * array(
+	 * 		$colname => array(
+	 * 			"header" => "", // Header to display in list and form label, default is colName 
+	 * 			"display" => array("view_list"|"view_detail"|...), // display this col in which view ? ref to _links
+	 * 			"primary" => TRUE/FALSE, // use to get primary key, just use 1 col 
+	 * 			"inputType" => "textarea"|"checkbox"|"select"|"multiple-select"|"radio"|"file-input"|"textbox", // guiding for rendering  
+	 * 			"inputData" => array(
+	 * 				"value1" => "description1",
+	 * 				"value2" => "description2",
+	 * 				...
+	 * 			), // support for inputType select or radio ...
+	 * 			"default" => "", // Using in create/update, priority higher than default in db
+	 * 			"nameidentity" => "" // identify name to use in header in display view_detail/edit/confirmDelete
+	 * 			// still thinking to add more customize. 
+	 * 		),
+	 * 		...
+	 * )
 	 */
 	var $_definitions;
 	/**
@@ -363,7 +381,7 @@ class CRUD {
 			{
 				/* Reference column: display a select box */
 				$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
-					.($isRequired?$this->_requiredAttribute:'').">\n";
+					.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">\n";
 				foreach ($refValue as $key => $value) {
 					$result .= "\t\t\t<option value=\"$key\" "
 						.((isset($data[$colName])&&$data[$colName]==$key)?' selected="selected" ':'')
@@ -404,7 +422,7 @@ class CRUD {
 							."name=\"$colName\" "
 							."rows=\"3\" "
 							."style=\"resize:none;\" "
-							.($isRequired?$this->_requiredAttribute:'').">"
+							.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">"
 							.(isset($data[$colName])?$data[$colName]:'')
 							."</textarea>\n";
 						break;
@@ -420,7 +438,7 @@ class CRUD {
 						break;
 					case "select":
 						$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
-							.($isRequired?$this->_requiredAttribute:'').">\n";
+							.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">\n";
 						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
 							$result .= "\t\t\t<option value=\"$value\""
 								.((isset($data[$colName])&&$data[$colName]==$value)?' selected="selected" ':'')
@@ -430,7 +448,7 @@ class CRUD {
 						break;
 					case "multiple-select":
 						$result .= "\t\t<select multiple=\"multiple\" name=\"$colName\" id=\"$colName\" "
-							.($isRequired?$this->_requiredAttribute:'').">\n";
+							.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">\n";
 						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
 							$result .= "\t\t\t<option value=\"$value\""
 								.((isset($data[$colName])&&$data[$colName]==$value)?' selected="selected" ':'')
@@ -443,7 +461,7 @@ class CRUD {
 							$result .= "\t\t<label class=\"radio\">"
 								."<input name=\"$colName\" id=\"$colName\" "
 									."value=\"$value\" type=\"radio\" "
-									.($isRequired?$this->_requiredAttribute:'').""
+									.($isRequired?self::_REQUIRED_ATTRIBUTE:'').""
 									.((isset($data[$colName])&&$data[$colName]==$value)?' selected="selected" ':'')
 									."> $description\n";
 						}
@@ -469,7 +487,7 @@ class CRUD {
 								."class=\"input-xlarge\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
-								.($isRequired?$this->_requiredAttribute:'')." "
+								.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." "
 								."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
 								.">\n";
 						}else if ( strpos($colDefine['type'], 'text') === 0 )// text
@@ -479,7 +497,7 @@ class CRUD {
 								."name=\"$colName\" "
 								."rows=\"3\" "
 								."style=\"resize:none;\" "
-								.($isRequired?$this->_requiredAttribute:'')." >"
+								.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." >"
 								.(isset($data[$colName])?$data[$colName]:'')
 								."</textarea>\n";
 						}else if ( strpos($colDefine['type'], 'enum') === 0 )// enum
@@ -489,7 +507,7 @@ class CRUD {
 							$optList = explode(",", $optList);
 							
 							$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
-								.($isRequired?$this->_requiredAttribute:'').">\n";
+								.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">\n";
 							foreach ($optList as $opt ) {
 								$opt = substr($opt, 1, strlen($opt)-2);
 								$result .= "\t\t\t<option value=\"$opt\" "
@@ -503,7 +521,7 @@ class CRUD {
 								."class=\"input-xlarge\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
-								.($isRequired?$this->_requiredAttribute:'')." "
+								.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." "
 								."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
 								." >\n";
 						}else if ( strpos($colDefine['type'], 'decimal') === 0
@@ -518,7 +536,7 @@ class CRUD {
 								."class=\"input-xlarge\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
-								.($isRequired?$this->_requiredAttribute:'')." "
+								.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." "
 								."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
 								.">\n";
 						}
@@ -531,7 +549,7 @@ class CRUD {
 							."class=\"input-xlarge\" "
 							."id=\"$colName\" "
 							."name=\"$colName\" "
-							.($isRequired?$this->_requiredAttribute:'')." "
+							.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." "
 							."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
 							.">\n";
 						break;
@@ -660,7 +678,10 @@ class CRUD {
 		}
 		return $this->_pageIndex;
 	}
-
+	/**
+	 * 
+	 * @param array of definition $columnDefine
+	 */
 	public function ColumnDefine($columnDefine = NULL)
 	{
 		if ($columnDefine != NULL) {
