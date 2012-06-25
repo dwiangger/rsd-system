@@ -19,7 +19,10 @@ class Acl {
 
 		/* load libraries, helpers manually in case not autoload */
 		$this->CI->load->database();
-
+		
+		$_userInfoTableName = NULL;
+		$_userTableName = NULL;
+		
 		log_message('debug', "ACL Class Initialized");
 	}
 	/**
@@ -34,6 +37,11 @@ class Acl {
 	 * User-Role table name
 	 */
 	const USER_ROLE_TABLE = 'acl_role_user';
+	/**
+	 * User info table
+	 */
+	var $_userTableName;
+	var $_userInfoTableName;
 	/**
 	 * Role management method set 
 	 * A role has only unique [name] as identify and [description] 
@@ -77,7 +85,41 @@ class Acl {
 	 */
 	public function getUsers()
 	{
+		$this->CI->db->from($this->_userTableName);
+		if ( $this->_userInfoTableName != NULL)
+		{
+			/* has user info table */
+			$this->CI->db->join($this->_userInfoTableName,
+				$this->_userTableName.'.id='.$this->_userInfoTableName.'.id',
+				'left');
+			$this->CI->db->select($this->_userTableName.'.id, '
+				.$this->_userTableName.'.user_id, '
+				.'CONCAT('
+					.'first_name,'
+					."' ', "
+					.'last_name'
+				.') AS `name`',FALSE);
+		}else
+		{
+			/* without user info table */
+			$this->CI->db->select($this->_userTableName.'.id, '
+				.$this->_userTableName.'.user_id, '
+				.$this->_userTableName.'.user_id AS `name` ');
+		}
+
+		$query = $this->CI->db->get();
+		$list = array();
+		foreach ($query->result() as $row) {
+			$item = array();
+			
+			$item['user_id'] = $row->user_id;
+			/* if user_info is not set, use user_id */
+			$item['name'] = ($row->name!=NULL)?$row->name:$item['user_id'];
+			
+			$list[$row->id] = $item;
+		}
 		
+		return $list;
 	}
 	/**
 	 * 
@@ -398,5 +440,28 @@ class Acl {
     	
     	return $query->result();
     }
-    
+    /**
+     * Warpper for _userTableName
+     */
+    public function UserTableName($name = NULL)
+    {
+    	if ($name == NULL)
+    	{
+    		$this->_userTableName = NULL;
+    	}
+    	$this->_userTableName = (string)$name;
+    	return $this->_userTableName;
+    }
+    /**
+     * Warpper for _userInfoTableName
+     */
+    public function UserInfoTableName($name = NULL)
+    {
+    	if ($name == NULL)
+    	{
+    		$this->_userInfoTableName = NULL;
+    	}
+    	$this->_userInfoTableName = (string)$name;
+    	return $this->_userInfoTableName;
+    }
 }

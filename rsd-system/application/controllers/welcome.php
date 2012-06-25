@@ -69,66 +69,16 @@ class Welcome extends CI_Controller {
 		$this->template->render();
 	}
 	
-	public function test($page=1)
+	public function test()
 	{
-		$this->load->library('crudlib/crud');
+		$this->load->library('auth/acl');
 		$rsl = TRUE;
-		
 		/* Attack */
-		$this->crud->TableName("teams");
-		$this->crud->Option("render-by-data-type",TRUE);
-		
-		$this->crud->ColumnDefine(array(
-			'id' => array(
-				'display' => FALSE,
-				'primary' => TRUE
-			),
-			'name' => array(
-				'display' => TRUE, 
-				'header' => "Name"
-			),
-			'description' => array(
-				'display' => TRUE,
-				'header' => "Description",
-				'inputType' => 'textarea',
-				'inputData' => array(
-					'value' => 'team desc',
-					'description' => 'Team description'
-				)
-			),
-			'project_id' => array(
-				'display' => TRUE,
-				'header' => "Project",
-				'ref' => array(
-					'firstChain' => 'projects',
-					'lastChain' => 'projects',
-					'displayCol' => 'name',
-					'chain' => array(
-						'projects' => array(
-							'indexCol' => 'id',
-							'refCol' => '',
-							'nextChain' => ''
-						)
-					)
-				)
-			)
-		));
-		/* list */ 
-		$this->crud->Option("indexColumn",TRUE);
-		$this->crud->Link("view_list",
-			$this->config->item('base_url')."index.php/welcome/test/{page-index}");
-		$this->crud->Link("view_edit",
-			$this->config->item('base_url')."index.php/welcome/edit/{item-index}");
-		$this->crud->Link("view_confirmDelete",
-			$this->config->item('base_url')."index.php/welcome/delete/{item-index}");
-		$this->crud->PageSize(10);
-		$this->crud->PageIndex($page);
-		/* detail */
-		$this->crud->ItemId(1);
-		/* */
-		$data = $this->crud->render_editForm();
-		//$data = $this->crud->render_createForm();
-		
+		$this->acl->UserInfoTableName('user_info');
+		$this->acl->UserTableName('users');
+		$data = print_r(
+			$this->acl->getUsers()
+			,true);
 		/* Result */
 		$this->template->write_view(
 			'_navigation',
