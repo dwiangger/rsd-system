@@ -7,6 +7,7 @@ class Authenticate extends CI_Controller {
 		parent::__construct();
 		//$this->output->enable_profiler(TRUE);
 		$this->load->library('auth/authentication');
+		$this->load->library('auth/acl');
 	}
 	/**
 	 * 
@@ -79,5 +80,41 @@ class Authenticate extends CI_Controller {
 	{
 		$this->authentication->doLogout();
 		redirect('welcome');
+	}
+	/**
+	 * ACL control:
+	 */
+	public function acl_matrix($matrix = "input")
+	{
+		$data = array();
+		
+		$this->acl->UserTableName('users');
+		$this->acl->UserInfoTableName('user_info');
+		$data['users'] = $this->acl->getUsers();
+		$data['roles'] = $this->acl->getRoles();
+		if ($matrix == "view")
+		{
+			/* display matrix */
+			/* 
+			 * scan all posted user id & role id, 
+			 * 	remove from $data list 
+			 * 	add to matrix data
+			 */
+			
+			/* build matrix */
+			
+			/* push to $data */
+			
+		}
+		/* default display input form */
+		
+		/* render */
+		/* Use template library instead */
+		$this->template->write_view(
+			'_content', 
+			'acl_matrix', 
+			$data, 
+			TRUE);
+		$this->template->render();
 	}
 }
