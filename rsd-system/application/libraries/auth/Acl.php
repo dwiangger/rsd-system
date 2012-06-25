@@ -41,6 +41,13 @@ class Acl {
 	/**
 	 * 
 	 * Get all available roles. 
+	 *	array (
+	 *		id => array(
+	 *			'name' => name, 
+	 *			'description' => description
+	 *		),
+	 *		...
+	 *	)
 	 */
 	public function getRoles()
 	{
