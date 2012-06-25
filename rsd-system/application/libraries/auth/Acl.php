@@ -40,7 +40,7 @@ class Acl {
 	 */
 	/**
 	 * 
-	 * Get all available roles
+	 * Get all available roles. 
 	 */
 	public function getRoles()
 	{
@@ -56,6 +56,21 @@ class Acl {
 		}
 		
 		return $list;
+	}
+	/**
+	 * 
+	 * get all available user as 
+	 * array(
+	 * 	id => array(
+	 * 		'user_id' => user id,
+	 * 		'name' => full name // ref to user info table 
+	 * 	),
+	 * 	...
+	 * ) 
+	 */
+	public function getUsers()
+	{
+		
 	}
 	/**
 	 * 
