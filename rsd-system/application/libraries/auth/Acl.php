@@ -47,7 +47,12 @@ class Acl {
 		$list = array();
 		$query = $this->CI->db->get(self::ROLE_TABLE);
 		foreach ($query->result() as $row) {
-			array_push($list,$row);
+			$item = array();
+			
+			$item['name'] = $row->name;
+			$item['description'] = $row->description;
+			
+			$list[$row->id] = $item;
 		}
 		
 		return $list;
