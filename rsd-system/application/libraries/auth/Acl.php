@@ -209,7 +209,7 @@ class Acl {
 	 * user-role has not permitted with have value 0 or not display in matrix. 
 	 * $result[user][role] = 1/0/not exist 
 	 */
-	public function getUsersRolesMatrix()
+	public function getAllUsersRolesMatrix()
 	{
 		$userTableName = $this->CI->authentication->getUserTableName(); 
 		$fullUserTableName = $this->CI->db->dbprefix($userTableName);
@@ -258,6 +258,34 @@ class Acl {
 		$query->free_result();
 
 		return $matrix;
+	}
+	/**
+	 * 
+	 * Query matrix by a specific user-id-list and role-id-list
+	 * @param array(user-id) $userIdList
+	 * @param array(role-id) $roleIdList
+	 */
+	public function getUsersRolesMatrix($userIdList, $roleIdList)
+	{
+		/* prepare a blank matrix */
+		$list = array();
+		foreach ($userIdList as $userId) {
+			$list[$userId] = array();
+			foreach ($roleIdList as $roleId) {
+				$list[$userId][$roleId] = 0;
+			}
+		}
+		/* fill data in db to matrix */
+		$this->CI->db->where_in('user_id',$userIdList);
+		$this->CI->db->where_in('role_id',$roleIdList);
+		
+		$query = $this->CI->db->get('acl_role_user');
+		
+		foreach ($query->result() as $row) {
+			$list[$row->user_id][$row->role_id] = (int)$row->permission;
+		}
+		
+		return $list;
 	}
 	/**
 	 * 
