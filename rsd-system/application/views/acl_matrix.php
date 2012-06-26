@@ -23,6 +23,7 @@
 				$('input[role-id="'+roleId+'"]').removeAttr("checked");				
 			}
 		});
+		/* handle shorten list by 4*/
 	});
 </script>
 		<?php 
@@ -38,13 +39,24 @@
 		<?php 
 		if($matrix)
 		{
+/* Add more col in case total role < 4 */
+$total = count($selectedRoles);
+$pad = (4 - ($total % 4))%4;
 			?>
 	<br />			
 		<div class="row content">
 			<div class="span12">
 				<div class="row" style="font-weight:bold;border-bottom:1px solid #dddddd;border-top:1px solid #dddddd;">
 					<div class="span2">User/Role</div>
-					<div class="span1">left</div>
+					<div class="span1"><?php 
+						if ($total > 4)
+						{
+							echo '<i class="icon-forward"></i>';
+						}else
+						{
+							echo '<i class="icon-forward icon-white"></i>';
+						}
+					?></div>
 <?php 
 foreach ($selectedRoles as $id => $role) {
 	?>
@@ -53,10 +65,16 @@ foreach ($selectedRoles as $id => $role) {
 </div>
 	<?php 
 }
-/* Add more col in case total role < 4 */
-$pad = (4 - count($selectedRoles) > 0)?(4 - count($selectedRoles)):0;
 ?>
-					<div class="span1<?= ' offset'.($pad*2) ?>">right</div>
+					<div class="span1<?= ' offset'.($pad*2) ?>"><?php 
+						if ($total > 4)
+						{
+							echo '<i class="icon-forward"></i>';
+						}else
+						{
+							echo '<i class="icon-forward icon-white"></i>';
+						}
+					?></div>
 				</div>
 <?php 
 foreach ($selectedUsers as $userId => $userName) {
