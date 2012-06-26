@@ -390,6 +390,35 @@ class Acl {
     	}
     	return TRUE;
 	}
+	/**
+	 * 
+	 * Update by Id
+	 * @param unknown_type $userId
+	 * @param unknown_type $roleId
+	 * @param unknown_type $permission
+	 */
+	public function updatePermissionById($userId, $roleId, $permission)
+	{
+		/* update */
+		$this->CI->db->where('user_id', $userId);
+		$this->CI->db->where('role_id', $roleId);
+		$query = $this->CI->db->get('acl_role_user');
+
+		if ($query->num_rows() >= 1) {
+			$this->CI->db->where('user_id', $userId);
+			$this->CI->db->where('role_id', $roleId);
+			$this->CI->db->limit(1);
+			$this->CI->db->update('acl_role_user', 
+				array('permission' => (int)$permission));
+		}else 
+		{
+			$this->CI->db->insert('acl_role_user',array(
+				'user_id' => $userId,
+				'role_id' => $roleId,
+				'permission' => (int)$permission
+			)); 			
+		}
+	}
 	
 	/**
 	 * Check specific role of specific user

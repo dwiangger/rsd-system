@@ -16,6 +16,7 @@
 	}
 ?>
 <div id="matrix">
+<?= form_open('authenticate/update_matrix'); ?>
 	<div class="row title">
 		<div class="span12">
 			<h3><a href="#">Access control list</a></h3>
@@ -25,6 +26,7 @@
 		if($matrix)
 		{
 			?>
+	<br />			
 		<div class="row content">
 			<div class="span12">
 				<div class="row" style="font-weight:bold;border-bottom:1px solid #dddddd;border-top:1px solid #dddddd;">
@@ -33,7 +35,9 @@
 <?php 
 foreach ($selectedRoles as $id => $role) {
 	?>
-<div class="span2"><?= $role ?></div>
+<div class="span2"><?= $role ?>
+<input type="hidden" name="roleIdList[]" value="<?= $id ?>" />
+</div>
 	<?php 
 }
 /* Add more col in case total role < 4 */
@@ -45,14 +49,20 @@ $pad = (4 - count($selectedRoles) > 0)?(4 - count($selectedRoles)):0;
 foreach ($selectedUsers as $userId => $userName) {
 	?>
 <div class="row" style="border-bottom:1px solid #dddddd;">
-	<div class="span2"><?= $userName ?></div>
+	<div class="span2"><?= $userName ?>
+	<input type="hidden" name="userIdList[]" value="<?= $userId ?>" />
+	</div>
 	<div class="span1">&nbsp;</div>
 		<?php 
 		foreach ($selectedRoles as $roleId => $role) {
 			?>
-	<div class="span2"><?php
-			echo $permission[$userId][$roleId]; 
-			?></div>
+	<div class="span2">
+		<input type="checkbox" <?= ($permission[$userId][$roleId]==1?'checked="checked"':'') ?>
+			role-id="<?= $roleId ?>" 
+			id="<?= 'checkbox_'.$userId.'_'.$roleId ?>" 
+			name="<?= 'checkbox_'.$userId.'_'.$roleId ?>" 
+			value="1"/>
+	</div>
 			<?php 
 		}
 		?>
@@ -62,10 +72,38 @@ foreach ($selectedUsers as $userId => $userName) {
 }
 ?>
 			</div>
-		</div>				
+		</div>
+		<div class="row">
+			<div class="span2">&nbsp;</div>
+			<div class="span1">&nbsp;</div>
+				<?php 
+				foreach ($selectedRoles as $roleId => $role) {
+					?>
+			<div class="span2">
+				<input type="checkbox" 
+					class="check-all" 
+					role-id="<?= $roleId ?>" 
+					user-id=""/>
+			</div>
+					<?php 
+				}
+				?>
+			<div class="span1<?= ' offset'.($pad*2) ?>">&nbsp;</div>
+		</div>
+		<br />
+		<div class="row">
+			<div class="span12" style="text-align:center;">
+				<fieldset>
+				<button class="btn btn-primary">Update</button>
+				<a href="<?= site_url('authenticate/acl_matrix') ?>" class="btn">Cancel</a>
+				</fieldset>
+			</div>
+		</div>						
 			<?php 
 		}
 		?>
+
+<?= form_close(); ?>
 </div> <!-- close:matrix -->
 <div id="input-box">
 <?= form_open('authenticate/acl_matrix/view'); ?>
@@ -111,7 +149,7 @@ foreach ($roles as $id => $role) {
 				</div>
 			</div>
 		</div>
-		<div class="span2"><button class="btn btn-primary">update</button></div>
+		<div class="span2"><button class="btn btn-primary">View matrix</button></div>
 	</div>
 <?= form_close(); ?>
 </div> <!-- close:input-box -->

@@ -134,4 +134,28 @@ class Authenticate extends CI_Controller {
 			TRUE);
 		$this->template->render();
 	}
+	/**
+	 * 
+	 * Update matrix
+	 */
+	public function update_matrix()
+	{
+		$userIdList = $this->input->post('userIdList');
+		$roleIdList = $this->input->post('roleIdList');
+		/* checkout posted data */
+		foreach ($userIdList as $userId) {
+			foreach ($roleIdList as $roleId) {
+				if ($this->input->post('checkbox_'.$userId.'_'.$roleId) !== FALSE 
+					&& $this->input->post('checkbox_'.$userId.'_'.$roleId) == 1 )
+				{
+					$this->acl->updatePermissionById($userId,$roleId,1);
+				}else 
+				{
+					$this->acl->updatePermissionById($userId,$roleId,0);
+				}
+			}
+		}
+		/* redirect to somewhere, it's better ti redirect to a matrix with all previous users,roles */
+		redirect('authenticate/acl_matrix');
+	}
 }
