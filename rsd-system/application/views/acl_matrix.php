@@ -4,11 +4,24 @@
 		?>
 <script>
 	$(document).ready(function(){
+		/* toggle input area if matrix is displayed */
 		$("#input-box div.content").toggle();
 		$("#input-box div.title a").click(function(e){
 			e.preventDefault();
 
 			$("#input-box div.content").toggle("slow");
+		});
+		/* check-all check box */
+		$("input.check-all").change(function(){
+			if( $(this).is(":checked") )
+			{
+				var roleId = $(this).attr('role-id');
+				$('input[role-id="'+roleId+'"]').attr("checked","checked");
+			}else
+			{
+				var roleId = $(this).attr('role-id');
+				$('input[role-id="'+roleId+'"]').removeAttr("checked");				
+			}
 		});
 	});
 </script>
@@ -119,7 +132,7 @@ foreach ($selectedUsers as $userId => $userName) {
 			</div>
 			<div class="row">	
 				<div class="span3">
-					<select id="users" name="users[]" multiple="multiple">
+					<select id="users" name="users[]" multiple="multiple" required="required">
 <?php 
 foreach ($users as $id => $user) {
 	?>
@@ -137,7 +150,7 @@ foreach ($users as $id => $user) {
 			</div>
 			<div class="row">	
 				<div class="span3">
-					<select id="roles" name="roles[]" multiple="multiple">
+					<select id="roles" name="roles[]" multiple="multiple" required="required">
 <?php 
 foreach ($roles as $id => $role) {
 	?>
