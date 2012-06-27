@@ -1,4 +1,5 @@
 <?php 
+/* Script handle matrix form only */
 	if($matrix)
 	{
 		?>
@@ -37,6 +38,7 @@
 			}
 		});
 		/* handle navigation */
+		/* previous link */
 		$("#prev-page").click(function(e){
 			e.preventDefault();
 			if(index > 1)
@@ -59,6 +61,7 @@
 				}
 			}
 		});
+		/* next link */
 		$("#next-page").click(function(e){
 			e.preventDefault();
 			if(index < total)
@@ -94,13 +97,12 @@
 			<h3><a href="#">Access control list</a></h3>
 		</div>
 	</div>
-		<?php 
+		<?php
+		/* if data for matrix is available */ 
 		if($matrix)
 		{
-/* Add more col in case total role < 4 */
-$total = count($selectedRoles);
 			?>
-	<br />			
+	<br />
 		<div class="row content">
 			<div class="span12">
 				<div class="row" style="font-weight:bold;border-bottom:1px solid #dddddd;border-top:1px solid #dddddd;">
@@ -112,6 +114,7 @@ $total = count($selectedRoles);
 <?php 
 $i = 1;
 foreach ($selectedRoles as $id => $role) {
+	/* open role page */
 	if($i%4 == 1)
 	{
 		?>
@@ -124,6 +127,7 @@ foreach ($selectedRoles as $id => $role) {
 		<input type="hidden" name="roleIdList[]" value="<?= $id ?>" />
 		</div>
 	<?php 
+	/* Display end of role page */
 	if($i%4 == 0)
 	{
 		?>
@@ -140,6 +144,9 @@ if ($i%4 != 0)
 		?>
 	</div>		
 </div>
+<?php
+// Total page for navigation  
+?>
 <input type="hidden" id="total-page" value="<?= ceil($i/4) ?>"/>
 		<?php 
 }
@@ -150,6 +157,7 @@ if ($i%4 != 0)
 					</div>
 				</div>
 <?php 
+/* Display roles for each user */
 foreach ($selectedUsers as $userId => $userName) {
 	?>
 <div class="row" style="border-bottom:1px solid #dddddd;">
@@ -158,6 +166,7 @@ foreach ($selectedUsers as $userId => $userName) {
 	</div>
 	<div class="span1">&nbsp;</div>
 		<?php 
+		/* open role page */
 		$i = 1;
 		foreach ($selectedRoles as $roleId => $role) {
 			if($i%4 == 1)
@@ -176,6 +185,7 @@ foreach ($selectedUsers as $userId => $userName) {
 			value="1"/>
 	</div>
 			<?php 
+			/* Display end of role page */
 			if($i%4 == 0)
 			{
 				?>
