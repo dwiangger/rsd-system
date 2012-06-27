@@ -24,11 +24,62 @@
 			}
 		});
 		/* handle shorten list by page*/
+		/* Hide all except page 1 */
 		var index=1;
+		var total = $("#total-page").val();
+		$("#prev-page").hide();
+		$("#next-page").hide();
 		$("div.role-page").each(function(){
-			if($(this).attr("page") != 1)
+			if($(this).attr("page") != index)
 			{
 				$(this).hide();
+				$("#next-page").show();
+			}
+		});
+		/* handle navigation */
+		$("#prev-page").click(function(e){
+			e.preventDefault();
+			if(index > 1)
+			{
+				index--;
+				$("div.role-page").show();
+				$("div.role-page").each(function(){
+					if($(this).attr("page") != index)
+					{
+						$(this).hide();
+					}
+				});
+				$("#next-page").show();
+				if(index <= 1)
+				{
+					$("#prev-page").hide();
+				}else
+				{
+					$("#prev-page").show();
+				}
+			}
+		});
+		$("#next-page").click(function(e){
+			e.preventDefault();
+			if(index < total)
+			{
+				index++;
+				$("div.role-page").show();
+				$("div.role-page").each(function(){
+					if($(this).attr("page") != index)
+					{
+						$(this).hide();
+					}
+				});
+				$("#prev-page").show();
+				
+				if(index >= total)
+				{
+					$("#next-page").hide();
+				}else
+				{
+					$("#next-page").show();
+				}
 			}
 		});
 	});
@@ -54,15 +105,9 @@ $total = count($selectedRoles);
 			<div class="span12">
 				<div class="row" style="font-weight:bold;border-bottom:1px solid #dddddd;border-top:1px solid #dddddd;">
 					<div class="span2">User/Role</div>
-					<div class="span1"><?php 
-						if ($total > 4)
-						{
-							echo '<i class="icon-backward"></i>';
-						}else
-						{
-							echo '<i class="icon-backward icon-white"></i>';
-						}
-					?></div>
+					<div class="span1">
+						<a href="#" id="prev-page"><i class="icon-backward"></i></a>&nbsp;
+					</div>
 <!-- Display role pages, each has 4 roles -->
 <?php 
 $i = 1;
@@ -95,19 +140,14 @@ if ($i%4 != 0)
 		?>
 	</div>		
 </div>
+<input type="hidden" id="total-page" value="<?= ceil($i/4) ?>"/>
 		<?php 
 }
 ?>
 <!-- end of all role pages -->
-					<div class="span1"><?php 
-						if ($total > 4)
-						{
-							echo '<i class="icon-forward"></i>';
-						}else
-						{
-							echo '<i class="icon-forward icon-white"></i>';
-						}
-					?></div>
+					<div class="span1">
+						<a href="#" id="next-page"><i class="icon-forward"></i></a>&nbsp;
+					</div>
 				</div>
 <?php 
 foreach ($selectedUsers as $userId => $userName) {
