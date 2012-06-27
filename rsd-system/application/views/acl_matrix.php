@@ -23,7 +23,14 @@
 				$('input[role-id="'+roleId+'"]').removeAttr("checked");				
 			}
 		});
-		/* handle shorten list by 4*/
+		/* handle shorten list by page*/
+		var index=1;
+		$("div.role-page").each(function(){
+			if($(this).attr("page") != 1)
+			{
+				$(this).hide();
+			}
+		});
 	});
 </script>
 		<?php 
@@ -41,7 +48,6 @@
 		{
 /* Add more col in case total role < 4 */
 $total = count($selectedRoles);
-$pad = (4 - ($total % 4))%4;
 			?>
 	<br />			
 		<div class="row content">
@@ -51,22 +57,49 @@ $pad = (4 - ($total % 4))%4;
 					<div class="span1"><?php 
 						if ($total > 4)
 						{
-							echo '<i class="icon-forward"></i>';
+							echo '<i class="icon-backward"></i>';
 						}else
 						{
-							echo '<i class="icon-forward icon-white"></i>';
+							echo '<i class="icon-backward icon-white"></i>';
 						}
 					?></div>
+<!-- Display role pages, each has 4 roles -->
 <?php 
+$i = 1;
 foreach ($selectedRoles as $id => $role) {
+	if($i%4 == 1)
+	{
+		?>
+<div class="span8 role-page" page="<?= floor($i/4 + 1) ?>">
+	<div class="row">
+		<?php 		
+	}
 	?>
-<div class="span2"><?= $role ?>
-<input type="hidden" name="roleIdList[]" value="<?= $id ?>" />
-</div>
+		<div class="span2"><?= $role ?>
+		<input type="hidden" name="roleIdList[]" value="<?= $id ?>" />
+		</div>
 	<?php 
+	if($i%4 == 0)
+	{
+		?>
+	</div>		
+</div>
+		<?php 
+	}
+	$i++;
+}
+/* display incase the last one is not %4 == 0 */
+$i--;
+if ($i%4 != 0)
+{
+		?>
+	</div>		
+</div>
+		<?php 
 }
 ?>
-					<div class="span1<?= ' offset'.($pad*2) ?>"><?php 
+<!-- end of all role pages -->
+					<div class="span1"><?php 
 						if ($total > 4)
 						{
 							echo '<i class="icon-forward"></i>';
@@ -85,7 +118,15 @@ foreach ($selectedUsers as $userId => $userName) {
 	</div>
 	<div class="span1">&nbsp;</div>
 		<?php 
+		$i = 1;
 		foreach ($selectedRoles as $roleId => $role) {
+			if($i%4 == 1)
+			{
+				?>
+		<div class="span8 role-page" page="<?= floor($i/4 + 1) ?>">
+			<div class="row">
+				<?php 		
+			}
 			?>
 	<div class="span2">
 		<input type="checkbox" <?= ($permission[$userId][$roleId]==1?'checked="checked"':'') ?>
@@ -95,9 +136,25 @@ foreach ($selectedUsers as $userId => $userName) {
 			value="1"/>
 	</div>
 			<?php 
+			if($i%4 == 0)
+			{
+				?>
+			</div>		
+		</div>
+				<?php 
+			}
+			$i++;
 		}
+/* display incase the last one is not %4 == 0 */
+$i--;
+if ($i%4 != 0)
+{
 		?>
-	<div class="span1<?= ' offset'.($pad*2) ?>">&nbsp;</div>
+	</div>		
+</div>
+		<?php 
+}
+		?>
 </div>
 	<?php 
 }
@@ -107,8 +164,16 @@ foreach ($selectedUsers as $userId => $userName) {
 		<div class="row">
 			<div class="span2">&nbsp;</div>
 			<div class="span1">&nbsp;</div>
-				<?php 
+				<?php
+				$i=1; 
 				foreach ($selectedRoles as $roleId => $role) {
+					if($i%4 == 1)
+					{
+						?>
+				<div class="span8 role-page" page="<?= floor($i/4 + 1) ?>">
+					<div class="row">
+						<?php 		
+					}
 					?>
 			<div class="span2">
 				<input type="checkbox" 
@@ -117,9 +182,26 @@ foreach ($selectedUsers as $userId => $userName) {
 					user-id=""/>
 			</div>
 					<?php 
+					if($i%4 == 0)
+					{
+						?>
+					</div>		
+				</div>
+						<?php 
+					}
+					$i++;
 				}
+/* display incase the last one is not %4 == 0 */
+$i--;
+if ($i%4 != 0)
+{
+		?>
+	</div>		
+</div>
+		<?php 
+}
 				?>
-			<div class="span1<?= ' offset'.($pad*2) ?>">&nbsp;</div>
+			<div class="span1">&nbsp;</div>
 		</div>
 		<br />
 		<div class="row">
