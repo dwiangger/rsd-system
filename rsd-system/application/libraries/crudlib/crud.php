@@ -266,7 +266,10 @@ class CRUD {
 	
 	private function print_detail_html($data)
 	{
-		$result = "<div class=\"crud-detail-view\"><form class=\"form-horizontal\">\n<fieldset>\n";
+		$result = "<div class=\"crud-detail-view\">\n"
+			."<legend><strong>{item}</strong> detail :</legend>"
+			."<div class=\"row\">\n<div class=\"span10 offset1\">"
+			."<form class=\"form-horizontal\">\n<fieldset>\n";
 		foreach ($this->_definitions as $colName => $colDefine) {
 			if( $colDefine['display'] )
 			{
@@ -293,7 +296,9 @@ class CRUD {
 						.str_replace('{item-index}', $this->_itemId, $this->_links['view_confirmDelete'])
 						."\"><i class=\"icon-trash icon-white\"></i> Delete</a></div>\n";
 				}
-				$result .= "</fieldset>\n</form></div><!-- crud-detail-view -->\n";
+				$result .= "</fieldset>\n</form>\n"
+					."</div>\n</div>\n"
+					."</div><!-- crud-detail-view -->\n";
 			}
 		
 		return $result;
@@ -335,10 +340,12 @@ class CRUD {
 		
 		$query->free_result();
 		/* start display form */
-		$result .= "<div class=\"crud-create-form\"><form class=\"form-horizontal\" "
+		$result .= "<div class=\"crud-create-form\">\n"
+    		."\t<legend>$title</legend>\n"
+    		."<div class=\"row\">\n<div class=\"span10 offset1\">"
+			."<form class=\"form-horizontal\" "
 			."method=\"post\" action=\"$action\">\n"
-    		."\t<fieldset>\n"
-    		."\t\t<legend>$title</legend>\n";
+    		."\t<fieldset>\n";
     	/* Loop all field to generate input element */
 		foreach ($tableInfo as $colName => $colDefine) {
 			if ( strpos($colDefine['extra'],'auto_increment') !== FALSE )
@@ -581,7 +588,9 @@ class CRUD {
 			.(($this->_links['view_list'] != NULL )?str_replace('{page-index}','', $this->_links['view_list']):'#')
 			."\">Cancel</a>\n"
     		."\t</div>\n"
-			."</form></div><!-- crud-create-form -->\n";
+			."</form>\n"
+			."</div></div>\n"
+			."</div><!-- crud-create-form -->\n";
 		/* return */
 		return $result;
 	}
