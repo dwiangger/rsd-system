@@ -166,4 +166,80 @@ class Authenticate extends CI_Controller {
 		/* redirect to somewhere, it's better ti redirect to a matrix with all previous users,roles */
 		redirect('authenticate/acl_matrix');
 	}
+	/**
+	 * Create and update role
+	 */
+	public function role($action = "list", $id = 0)
+	{
+		$action = strtolower($action);
+		/* define for crud */
+		$this->load->library('crudlib/crud');
+		$this->crud->TableName("acl_roles");
+		$this->crud->ColumnDefine(array(
+			'id' => array(
+				'display' => FALSE,
+				'primary' => TRUE
+			),
+			'name' => array(
+				'display' => TRUE, 
+				'header' => "Name"
+			),
+			'description'=>array(
+				'display' => TRUE,
+				'header' => "Description",
+				'inputType' => 'textarea',
+				'inputData' => array(
+					'value' => 'team desc',
+					'description' => 'Team description'
+				)
+			)
+		));
+		/* handle action */
+		switch ($action) {
+			case 'view_create':
+				$this->crud->Link('create',
+					site_url('/authenticate/role/create')
+				);
+				$data = $this->crud->render_createForm();
+			break;
+			case 'view_edit':
+				$this->crud->ItemId($id);
+				$this->crud->Link('update',
+					site_url('/authenticate/role/update/{item-index}')
+				);
+				$data = $this->crud->render_editForm();
+				if ($data == NULL)
+				{
+					show_404($this->uri->uri_string(),FALSE);
+				}
+			break;
+			case 'create':
+				$id = $this->crud->action_create();
+		
+				redirect('/authenticate/role', 'refresh');
+			break;
+			case 'update':
+				$this->crud->ItemId($id);
+				$this->crud->action_update();
+		
+				redirect('/authenticate/role', 'refresh');
+			break;
+			case "list":
+			default:
+				/* display role list as default */
+				$this->crud->PageIndex($id>0?$id:1); // page-id must > 0
+				$this->crud->Link("view_edit",
+					site_url('/authenticate/role/view_edit/{item-index}'));
+				$data = $this->crud->render_list();
+			break;
+		}
+		/* Result */
+		$this->template->write_view(
+			'_navigation',
+			'template/navigation',array());
+		$this->template->write(
+			'_content',
+			$data);
+		$this->template->render();
+	}
 }
