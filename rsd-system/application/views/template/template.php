@@ -73,10 +73,9 @@
 <!-- end of Header -->
 
 <!-- container -->
-<div class="container">
+<div class="container" style="min-height:520px">
 <?= $_content ?>
 </div> <!-- close:container -->
-
 <div class="footer container">
 	<div class="row">
 		<div class="copyright span6">&copy; 2012. RSD system.</div>
