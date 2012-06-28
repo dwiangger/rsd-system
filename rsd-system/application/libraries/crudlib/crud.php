@@ -56,6 +56,7 @@ class CRUD {
 	 * General variable
 	 */
 	const _REQUIRED_ATTRIBUTE = 'required="required"';
+	const _DEFAULT_CONTROL_CSSCLASS = 'input-xlarge';
 	/**
 	 * table name need to handle 
 	 */
@@ -366,7 +367,7 @@ class CRUD {
 				continue;
 			}
 			/* get css class */
-			$cssClass = isset($this->_definitions[$colName]['class'])?$this->_definitions[$colName]['class']:'input-xlarge';
+			$cssClass = isset($this->_definitions[$colName]['class'])?$this->_definitions[$colName]['class']:self::_DEFAULT_CONTROL_CSSCLASS;
 			/* 
 			 * Is this filed required/ has no default value 
 			 * Column has default==NULL but not allow NULL value
