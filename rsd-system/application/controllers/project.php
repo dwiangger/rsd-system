@@ -20,7 +20,8 @@ class Project extends CI_Controller {
 			$this->config->item('base_url')."index.php/project/view_edit/{item-index}");
 		$this->crud->Link("view_confirmDelete",
 			$this->config->item('base_url')."index.php/project/view_confirm/{item-index}");
-		
+		$this->crud->Option('itemName','Project');
+			
 		$this->crud->ColumnDefine(array(
 			'id' => array(
 				'display' => FALSE,

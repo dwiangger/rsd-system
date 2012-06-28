@@ -29,6 +29,7 @@ class CRUD {
 		$this->_primaryCol = NULL;
 		$this->_options["render-by-data-type"] = TRUE;
 		$this->_options["indexColumn"] = TRUE;
+		$this->_options["itemName"] = "{item}";/* "{item}" will be replaced by object name */
 		$this->_pageSize = 10;
 		$this->_pageIndex = 1;
 		/* Default value for links */
@@ -125,7 +126,8 @@ class CRUD {
 		$indexColumn = FALSE;
 		$numRow = 0;
 		/* Init table */
-		$result = "\n<div class=\"crud-list-view\">"
+		$result = "\n<div class=\"crud-list-view\">\n"
+			."<legend><strong>".$this->_options['itemName']."</strong> list</legend>\n"
 			."<table class=\"table table-striped table-bordered table-condensed\">\n"
 			."\t<thead>\n"
 			."\t<tr>\n";
@@ -267,15 +269,20 @@ class CRUD {
 	private function print_detail_html($data)
 	{
 		$result = "<div class=\"crud-detail-view\">\n"
-			."<legend><strong>{item}</strong> detail :</legend>"
+			."<legend><strong>".$this->_options["itemName"]."</strong> detail</legend>"
 			."<div class=\"row\">\n<div class=\"span10 offset1\">"
 			."<form class=\"form-horizontal\">\n<fieldset>\n";
 		foreach ($this->_definitions as $colName => $colDefine) {
 			if( $colDefine['display'] )
 			{
-				$result .= "\t<div class=\"control-group\">\n"
-					."\t\t<label class=\"control-label\">".$colDefine['header']."</label>\n"
-					."\t\t<div class=\"controls\"><input type=\"text\" class=\"input-xlarge\" value=\"".$data[$colName]."\" readonly=\"readonly\"/></div>\n"
+				$result .= "\t<div class=\"row\" style=\"padding-bottom:3px;\">\n"
+					."\t\t<div class=\"span2\" style=\"text-align:right;\">"
+						."<strong>".$colDefine['header']."</strong>"
+					."</div>\n"
+					."\t\t<div class=\"span7\">"
+					//."<input type=\"text\" class=\"input-xlarge\" value=\"".$data[$colName]."\" readonly=\"readonly\"/>"
+					.$data[$colName]
+					."</div>\n"
 					."\t</div>\n";
 			}
 		}
@@ -307,8 +314,12 @@ class CRUD {
 	private function print_detail_form(
 		$data, /* Data object */ 
 		$action, /* form action */
-		$title = 'Create new <strong>{item}</strong>') /* "{item}" will be replaced by object name */
+		$title = NULL, 
+		$submitText = 'Create') /* text dixplay at submit button */
 	{
+		if ($title == NULL) {
+			$title = "Create new <strong>".$this->_options["itemName"]."</strong>";
+		}
 		/*
 		 * NOTE: only allow 1-chain-reference-column. 
 		 */
@@ -583,7 +594,7 @@ class CRUD {
 		/* button area */
     	$result .= "\t</fieldset>\n"
     		."\t<div class=\"form-actions\">\n"
-    		."\t\t<button class=\"btn btn-primary\" ><i class=\"icon-file icon-white\"></i> Create</button>\n"
+    		."\t\t<button class=\"btn btn-primary\" ><i class=\"icon-file icon-white\"></i> ".$submitText."</button>\n"
 			."\t\t<a class=\"btn\" href=\""
 			.(($this->_links['view_list'] != NULL )?str_replace('{page-index}','', $this->_links['view_list']):'#')
 			."\">Cancel</a>\n"
@@ -847,7 +858,7 @@ class CRUD {
 				."\t\t<h3>Delete confirmation</h3>"
 			."\t</div></div>\n"
 			."\t<div class=\"row\"><div class=\"span8\">\n"
-				."\t\t<div>Are you sure you want to delete <strong>{item}</strong> ?</div>\n"
+				."\t\t<div>Are you sure you want to delete <strong>".$this->_options["itemName"]."</strong> ?</div>\n"
 			."\t</div></div>\n"
 			."\t<br />"
 			."\t<div class=\"row\"><div class=\"span8\" style=\"text-align: center;\">\n"
@@ -925,7 +936,10 @@ class CRUD {
 			$action = str_replace('{item-index}', $this->_itemId, $this->_links['update']);
 		}
 		
-		return self::print_detail_form($result,$action,'Edit <strong>{item}</strong>:');
+		return self::print_detail_form(
+			$result,
+			$action,'Edit <strong>'.$this->_options["itemName"].'</strong>',
+			'Update');
 	}
 	/**
 	 * 3 action function 
