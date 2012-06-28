@@ -36,6 +36,7 @@ class Project extends CI_Controller {
 				'display' => TRUE,
 				'header' => "Description",
 				'inputType' => 'textarea',
+				'class' => 'span5',
 				'inputData' => array(
 					'value' => 'team desc',
 					'description' => 'Team description'

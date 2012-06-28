@@ -87,7 +87,8 @@ class CRUD {
 	 * 		$colname => array(
 	 * 			"header" => "", // Header to display in list and form label, default is colName 
 	 * 			"display" => array("view_list"|"view_detail"|...), // display this col in which view ? ref to _links
-	 * 			"width" => int, // with of cell in list table 
+	 * 			"width" => int, // with of cell in list table
+	 * 			"class" => "", // css class for control in detail form 
 	 * 			"primary" => TRUE/FALSE, // use to get primary key, just use 1 col 
 	 * 			"inputType" => "textarea"|"checkbox"|"select"|"multiple-select"|"radio"|"file-input"|"textbox", // guiding for rendering  
 	 * 			"inputData" => array(
@@ -364,6 +365,8 @@ class CRUD {
 				/* auto-increment column, no need to input */
 				continue;
 			}
+			/* get css class */
+			$cssClass = isset($this->_definitions[$colName]['class'])?$this->_definitions[$colName]['class']:'input-xlarge';
 			/* 
 			 * Is this filed required/ has no default value 
 			 * Column has default==NULL but not allow NULL value
@@ -413,7 +416,7 @@ class CRUD {
 			{
 				/* Reference column: display a select box */
 				$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
-					.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">\n";
+					.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." class=\"".$cssClass."\">\n";
 				foreach ($refValue as $key => $value) {
 					$result .= "\t\t\t<option value=\"$key\" "
 						.((isset($data[$colName])&&$data[$colName]==$key)?' selected="selected" ':'')
@@ -449,19 +452,18 @@ class CRUD {
 				switch ($inputType)
 				{
 					case "textarea":
-						$result .= "\t<textarea class=\"input-xlarge\" "
+						$result .= "\t<textarea "
 							."id=\"$colName\" "
 							."name=\"$colName\" "
 							."rows=\"3\" "
 							."style=\"resize:none;\" "
-							.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">"
+							.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." class=\"".$cssClass."\">"
 							.(isset($data[$colName])?$data[$colName]:'')
 							."</textarea>\n";
 						break;
 					case "checkbox":
 						$result .= "\t<label class=\"checkbox inline\">"
-							."<input type=\"checkbox\" "
-							."class=\"input-xlarge\" "
+							."<input type=\"checkbox\" class=\"$cssClass\""
 							."id=\"$colName\" "
 							."name=\"$colName\" "
 							."value=\"".$this->_definitions[$colName]['inputData']['value']."\""
@@ -470,7 +472,7 @@ class CRUD {
 						break;
 					case "select":
 						$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
-							.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">\n";
+							.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." class=\"".$cssClass."\">\n";
 						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
 							$result .= "\t\t\t<option value=\"$value\""
 								.((isset($data[$colName])&&$data[$colName]==$value)?' selected="selected" ':'')
@@ -480,7 +482,7 @@ class CRUD {
 						break;
 					case "multiple-select":
 						$result .= "\t\t<select multiple=\"multiple\" name=\"$colName\" id=\"$colName\" "
-							.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">\n";
+							.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." class=\"".$cssClass."\">\n";
 						foreach ($this->_definitions[$colName]['inputData'] as $value => $description ) {
 							$result .= "\t\t\t<option value=\"$value\""
 								.((isset($data[$colName])&&$data[$colName]==$value)?' selected="selected" ':'')
@@ -495,7 +497,7 @@ class CRUD {
 									."value=\"$value\" type=\"radio\" "
 									.($isRequired?self::_REQUIRED_ATTRIBUTE:'').""
 									.((isset($data[$colName])&&$data[$colName]==$value)?' selected="selected" ':'')
-									."> $description\n";
+									." class=\"".$cssClass."\"> $description\n";
 						}
 						break;
 					/* Default: based on data type: 
@@ -516,7 +518,7 @@ class CRUD {
 							|| strpos($colDefine['type'], 'time') === 0 )// date/datetime/time
 						{
 							$result .= "\t<input type=\"text\" "
-								."class=\"input-xlarge\" "
+								."class=\"".$cssClass."\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
 								.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." "
@@ -524,7 +526,7 @@ class CRUD {
 								.">\n";
 						}else if ( strpos($colDefine['type'], 'text') === 0 )// text
 						{
-							$result .= "\t<textarea class=\"input-xlarge\" "
+							$result .= "\t<textarea class=\"".$cssClass."\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
 								."rows=\"3\" "
@@ -539,7 +541,7 @@ class CRUD {
 							$optList = explode(",", $optList);
 							
 							$result .= "\t\t<select name=\"$colName\" id=\"$colName\" "
-								.($isRequired?self::_REQUIRED_ATTRIBUTE:'').">\n";
+								.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." class=\"".$cssClass."\">\n";
 							foreach ($optList as $opt ) {
 								$opt = substr($opt, 1, strlen($opt)-2);
 								$result .= "\t\t\t<option value=\"$opt\" "
@@ -550,7 +552,7 @@ class CRUD {
 						}else if ( strpos($colDefine['type'], 'int') === 0 )// int
 						{
 							$result .= "\t<input type=\"text\" "
-								."class=\"input-xlarge\" "
+								." class=\"".$cssClass."\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
 								.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." "
@@ -565,12 +567,12 @@ class CRUD {
 						}else //char/varchar/default
 						{
 							$result .= "\t<input type=\"text\" "
-								."class=\"input-xlarge\" "
+								."class=\"".$cssClass."\" "
 								."id=\"$colName\" "
 								."name=\"$colName\" "
 								.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." "
 								."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
-								.">\n";
+								." class=\"".$cssClass."\">\n";
 						}
 						break;
 					/* all these type will be handle as default textbox */
@@ -578,12 +580,12 @@ class CRUD {
 					case "textbox":
 					default: 
 						$result .= "\t<input type=\"text\" "
-							."class=\"input-xlarge\" "
+							."class=\"".$cssClass."\" "
 							."id=\"$colName\" "
 							."name=\"$colName\" "
 							.($isRequired?self::_REQUIRED_ATTRIBUTE:'')." "
 							."value=\"".(isset($data[$colName])?$data[$colName]:'')."\""
-							.">\n";
+							." class=\"".$cssClass."\">\n";
 						break;
 				}
 			}
