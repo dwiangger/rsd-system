@@ -100,6 +100,9 @@ class CRUD {
 	 * 			"default" => "", // Using in create/update, priority higher than default in db
 	 * 			"nameidentity" => "", // identify name to use in header in display view_detail/edit/confirmDelete
 	 * 			"ref" => array( // column which ref to other table
+	 * 
+	 * 
+	 * 
 	 * 			)
 	 * 			// still thinking to add more customize. 
 	 * 		),
@@ -649,7 +652,8 @@ class CRUD {
 						 * add dbprefix() to avoid CI auto add dbprefix to alias on join/join-condition clause 
 						 */
 						$this->CI->db->join("$currChain AS ".$this->CI->db->dbprefix($currChain.$i),
-							"$prevTable.$prevCol=".$this->CI->db->dbprefix($currChain.$i).".$indexCol");
+							"$prevTable.$prevCol=".$this->CI->db->dbprefix($currChain.$i).".$indexCol",
+							'left');/* Using left join, so if chain is missed, NULL value will returned */
 						/* Checking last chain */
 						if ( $currChain == $colDefine['ref']['lastChain'] )
 						{
