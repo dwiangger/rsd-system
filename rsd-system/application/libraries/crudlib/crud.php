@@ -98,7 +98,9 @@ class CRUD {
 	 * 				...
 	 * 			), // support for inputType select or radio ...
 	 * 			"default" => "", // Using in create/update, priority higher than default in db
-	 * 			"nameidentity" => "" // identify name to use in header in display view_detail/edit/confirmDelete
+	 * 			"nameidentity" => "", // identify name to use in header in display view_detail/edit/confirmDelete
+	 * 			"ref" => array( // column which ref to other table
+	 * 			)
 	 * 			// still thinking to add more customize. 
 	 * 		),
 	 * 		...
@@ -861,7 +863,7 @@ class CRUD {
 				."\t\t<h3>Delete confirmation</h3>"
 			."\t</div></div>\n"
 			."\t<div class=\"row\"><div class=\"span8\">\n"
-				."\t\t<div>Are you sure you want to delete <strong>".$this->_options["itemName"]."</strong> ?</div>\n"
+				."\t\t<div>Are you sure you want to delete this <strong>".$this->_options["itemName"]."</strong> ?</div>\n"
 			."\t</div></div>\n"
 			."\t<br />"
 			."\t<div class=\"row\"><div class=\"span8\" style=\"text-align: center;\">\n"
