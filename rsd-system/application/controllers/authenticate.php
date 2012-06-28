@@ -99,29 +99,37 @@ class Authenticate extends CI_Controller {
 			/* display matrix */
 			$selectedUsers = $this->input->post('users');
 			$selectedRoles = $this->input->post('roles');
-			$data['selectedUsers'] = array();
-			$data['selectedRoles'] = array();
-			/* 
-			 * scan all posted user id & role id, 
-			 * 	remove from $data list 
-			 * 	add to matrix data
-			 */
-			$data['matrix'] = TRUE;
-			/* build matrix */
-			foreach ($data['users'] as $id => $user) {
-				if( in_array($id,$selectedUsers) )
-				{
-					$data['selectedUsers'][$id] = $user['name'];
-				} 
+			/* If no input data, just display as $matrix==input */
+			if ( is_array($selectedUsers) && count($selectedUsers) > 0
+				&& is_array($selectedRoles) && count($selectedRoles) > 0 ) {
+					$data['selectedUsers'] = array();
+					$data['selectedRoles'] = array();
+					/* 
+					 * scan all posted user id & role id, 
+					 * 	remove from $data list 
+					 * 	add to matrix data
+					 */
+					$data['matrix'] = TRUE;
+					/* build matrix */
+					foreach ($data['users'] as $id => $user) {
+						if( in_array($id,$selectedUsers) )
+						{
+							$data['selectedUsers'][$id] = 
+								$user['name'];
+						} 
+					}
+					foreach ($data['roles'] as $id => $role) {
+						if( in_array($id,$selectedRoles) )
+						{
+							$data['selectedRoles'][$id] = 
+								$role['name'];
+						} 
+					}
+					/* push to $data */
+					$data['permission'] = $this->acl
+						->getUsersRolesMatrix(
+							$selectedUsers, $selectedRoles);
 			}
-			foreach ($data['roles'] as $id => $role) {
-				if( in_array($id,$selectedRoles) )
-				{
-					$data['selectedRoles'][$id] = $role['name'];
-				} 
-			}
-			/* push to $data */
-			$data['permission'] = $this->acl->getUsersRolesMatrix($selectedUsers, $selectedRoles);
 		}
 		/* default display input form */
 		
