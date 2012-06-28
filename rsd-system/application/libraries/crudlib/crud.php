@@ -220,38 +220,38 @@ class CRUD {
 		}
 		
 		/* Calculate and Generate navigation link */
-		$result .= "\t<tr><td colspan=\"$numRow\">";
+		$result .= "\t<tfoot><tr><td colspan=\"$numRow\" style=\"text-align:center;\">\n";
 		/* Previous link */
 		if ($this->_pageIndex > 1) {
 			$result .= "<a href=\"".str_replace("{page-index}", "", $this->_links['view_list'])."\" title=\"First page\" class=\"btn btn-mini\">"
-					."<i class=\"icon-fast-backward\"></i></a>";
+					."<i class=\"icon-fast-backward\"></i></a>\n";
 			$result .= "<a href=\"".str_replace("{page-index}", ($this->_pageIndex-1), $this->_links['view_list'])."\" title=\"Previous page\" class=\"btn btn-mini\">"
-					."<i class=\"icon-step-backward\"></i></a>";
+					."<i class=\"icon-step-backward\"></i></a>\n";
 		}else 
 		{
 			$result .= "<a href=\"#\" title=\"First page\" class=\"btn btn-mini disabled\">"
-					."<i class=\"icon-fast-backward\"></i></a>";
+					."<i class=\"icon-fast-backward\"></i></a>\n";
 			$result .= "<a href=\"#\" title=\"Previous page\" class=\"btn btn-mini disabled\">"
-					."<i class=\"icon-step-backward\"></i></a>";
+					."<i class=\"icon-step-backward\"></i></a>\n";
 		}
 		/* Display page, total ... */
 		$totalPage = (int)($this->_totalResults/$this->_pageSize)+1;
-		$result .= "<span>Page ".$this->_pageIndex."/".$totalPage." totals ".$this->_totalResults." result(s)</span>";
+		$result .= "\n<span>Page ".$this->_pageIndex."/".$totalPage." totals ".$this->_totalResults." result(s)</span>\n";
 		/* Next link */
 		if ( $this->_pageIndex >= $totalPage )
 		{
 			$result .= "<a href=\"#\" title=\"Next page\" class=\"btn btn-mini disabled\">"
-					."<i class=\"icon-step-forward\"></i></a>"
+					."<i class=\"icon-step-forward\"></i></a>\n"
 				."<a href=\"#\" title=\"Last page\" class=\"btn btn-mini disabled\">"
-					."<i class=\"icon-fast-forward\"></i></a>";
+					."<i class=\"icon-fast-forward\"></i></a>\n";
 		}else
 		{
 			$result .= "<a href=\"".str_replace("{page-index}", $this->_pageIndex+1, $this->_links['view_list'])."\" title=\"Next page\" class=\"btn btn-mini\">"
-					."<i class=\"icon-step-forward\"></i></a>"
+					."<i class=\"icon-step-forward\"></i></a>\n"
 				."<a href=\"".str_replace("{page-index}", $totalPage, $this->_links['view_list'])."\" title=\"Last page\" class=\"btn btn-mini\">"
-					."<i class=\"icon-fast-forward\"></i></a>";
+					."<i class=\"icon-fast-forward\"></i></a>\n";
 		}
-		$result .= "</td></tr>\n"
+		$result .= "\n</td></tr></tfoot>\n"
 			."</table></div><!-- crud-list-view -->\n";
 		return $result;
 	}
@@ -824,19 +824,24 @@ class CRUD {
 	public function render_confirmDelete()
 	{
 		/* just return a form to confirm deletation */
-		$result = "<div class=\"crud-confirm-delete span6 offset3\">\n";
-		$result .= "<div class=\"alert alert-error\">\n"
-			."\t<div class=\"row\"><div class=\"span6\">Are you sure you want to delete <strong>{item}</strong> ?</div></div>\n"
-			."<br />"
-			."\t<div class=\"row\"><div class=\"span6\">"
-				."<a class=\"btn btn-danger\" href=\""
+		$result = "<div class=\"crud-confirm-delete span8 offset2\">\n";
+		$result .= "\t<div class=\"alert alert-error\">\n"
+			."\t<div class=\"row\"><div class=\"span8\">\n"
+				."\t\t<h3>Delete confirmation</h3>"
+			."\t</div></div>\n"
+			."\t<div class=\"row\"><div class=\"span8\">\n"
+				."\t\t<div>Are you sure you want to delete <strong>{item}</strong> ?</div>\n"
+			."\t</div></div>\n"
+			."\t<br />"
+			."\t<div class=\"row\"><div class=\"span8\" style=\"text-align: center;\">\n"
+				."\t\t<a class=\"btn btn-danger\" href=\""
 				.(($this->_links['delete'] != NULL)?str_replace('{item-index}',$this->_itemId, $this->_links['delete']):'#')
-				."\"><i class=\"icon-trash icon-white\"></i> Delete</a>\n"
-				."<a class=\"btn\" href=\""
+				."\">\n\t\t<i class=\"icon-trash icon-white\"></i> Delete</a>\n"
+				."\t\t<a class=\"btn\" href=\""
 				.(($this->_links['view_list'] != NULL)?str_replace('{page-index}','', $this->_links['view_list']):'#')
-				."\">Cancel</a>"
-			."</div></div>\n";
-		$result .= "</div><!-- crud-confirm-delete -->\n";
+				."\">Cancel</a>\n"
+			."\t</div>\n</div>\n";
+		$result .= "</div></div><!-- crud-confirm-delete -->\n";
 		
 		return $result;
 	}
