@@ -169,55 +169,64 @@ class CRUD {
 		
 		/* Display index from first item's index */
 		$i = ($this->_pageIndex-1)*$this->_pageSize;
-		/* Ddisplay each row */
-		foreach ($data as $row) {
-			$result .= "\t<tr>\n";
-			/* Index row */
-			if ($indexColumn)
-			{
-				$result .= "\t\t<td style=\"width:25px;text-align:right;\">".(++$i)."</td>\n";
-			}
-			/* data rows */
-			foreach ($this->_definitions as $colName => $colDefine) {
-				if ( $colDefine['display'] )
+		/* in case nothing found */
+		if ($this->_totalResults <= 0) {
+			$result .= "\t<tr>\n<td colspan=\"$numRow\">Nothing found.</td></tr>\n";
+			$totalPage = 0;
+		}else 
+		{
+			/* count total page */
+			$totalPage = (int)(($this->_totalResults - 1)/$this->_pageSize)+1;
+			/* Display each row */
+			foreach ($data as $row) {
+				$result .= "\t<tr>\n";
+				/* Index row */
+				if ($indexColumn)
 				{
-					$result .= "\t\t<td>".$row[$colName]."</td>\n";
+					$result .= "\t\t<td style=\"width:25px;text-align:right;\">".(++$i)."</td>\n";
 				}
-			}
-			/* Action column */
-			if ($actionColumn) {
-				$result .= "\t\t<td style=\"width:60px;\"><div class=\"btn-group\">\n"
-					."\t\t\t<a class=\"btn btn-mini\" href=\"#\"><i class=\"icon-cog\"></i></a>\n"
-					."\t\t\t<a class=\"btn btn-mini dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\"><span class=\"caret\"></span></a>\n"
-					."\t\t\t<ul class=\"dropdown-menu\">\n";
-				if ($this->_links['view_detail'] != NULL)
-				{
-					$result .= "\t\t\t\t<li><a href=\""
-						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_links['view_detail'])
-						."\"><i class=\"icon-info-sign\"></i> Detail</a></li>\n";
-					if ($this->_links['view_edit'] != NULL
-						|| $this->_links['view_confirmDelete'] != NULL )
+				/* data rows */
+				foreach ($this->_definitions as $colName => $colDefine) {
+					if ( $colDefine['display'] )
 					{
-						$result .= "\t\t\t\t<li class=\"divider\"></li>";
-					}	
+						$result .= "\t\t<td>".$row[$colName]."</td>\n";
+					}
 				}
-				if ($this->_links['view_edit'] != NULL)
-				{
-					$result .= "\t\t\t\t<li><a href=\""
-						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_links['view_edit'])
-						."\"><i class=\"icon-pencil\"></i> Edit</a></li>\n";
+				/* Action column */
+				if ($actionColumn) {
+					$result .= "\t\t<td style=\"width:60px;\"><div class=\"btn-group\">\n"
+						."\t\t\t<a class=\"btn btn-mini\" href=\"#\"><i class=\"icon-cog\"></i></a>\n"
+						."\t\t\t<a class=\"btn btn-mini dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\"><span class=\"caret\"></span></a>\n"
+						."\t\t\t<ul class=\"dropdown-menu\">\n";
+					if ($this->_links['view_detail'] != NULL)
+					{
+						$result .= "\t\t\t\t<li><a href=\""
+							.str_replace('{item-index}', $row[$this->_primaryCol], $this->_links['view_detail'])
+							."\"><i class=\"icon-info-sign\"></i> Detail</a></li>\n";
+						if ($this->_links['view_edit'] != NULL
+							|| $this->_links['view_confirmDelete'] != NULL )
+						{
+							$result .= "\t\t\t\t<li class=\"divider\"></li>";
+						}	
+					}
+					if ($this->_links['view_edit'] != NULL)
+					{
+						$result .= "\t\t\t\t<li><a href=\""
+							.str_replace('{item-index}', $row[$this->_primaryCol], $this->_links['view_edit'])
+							."\"><i class=\"icon-pencil\"></i> Edit</a></li>\n";
+					}
+					if ($this->_links['view_confirmDelete'] != NULL)
+					{
+						$result .= "\t\t\t\t<li><a href=\""
+							.str_replace('{item-index}', $row[$this->_primaryCol], $this->_links['view_confirmDelete'])
+							."\"><i class=\"icon-trash\"></i> Delete</a></li>\n";
+					}
+					$result .= "\t\t\t</ul>\n\t\t</div></td>";
 				}
-				if ($this->_links['view_confirmDelete'] != NULL)
-				{
-					$result .= "\t\t\t\t<li><a href=\""
-						.str_replace('{item-index}', $row[$this->_primaryCol], $this->_links['view_confirmDelete'])
-						."\"><i class=\"icon-trash\"></i> Delete</a></li>\n";
-				}
-				$result .= "\t\t\t</ul>\n\t\t</div></td>";
+				
+				$result .= "\t</tr>\n";
 			}
-			
-			$result .= "\t</tr>\n";
-		}
+		}/* all row of page are shown */
 		
 		/* Calculate and Generate navigation link */
 		$result .= "\t<tfoot><tr><td colspan=\"$numRow\" style=\"text-align:center;\">\n";
@@ -235,7 +244,6 @@ class CRUD {
 					."<i class=\"icon-step-backward\"></i></a>\n";
 		}
 		/* Display page, total ... */
-		$totalPage = (int)($this->_totalResults/$this->_pageSize)+1;
 		$result .= "\n<span>Page ".$this->_pageIndex."/".$totalPage." totals ".$this->_totalResults." result(s)</span>\n";
 		/* Next link */
 		if ( $this->_pageIndex >= $totalPage )
