@@ -168,6 +168,8 @@ class Authenticate extends CI_Controller {
 	}
 	/**
 	 * Create and update role
+	 * $action = list(default)|view_create|view_edit|create|update 
+	 * $id = page-id|item-id
 	 */
 	public function role($action = "list", $id = 0)
 	{
@@ -197,12 +199,18 @@ class Authenticate extends CI_Controller {
 		/* handle action */
 		switch ($action) {
 			case 'view_create':
+				/**
+				 * Create form 
+				 */
 				$this->crud->Link('create',
 					site_url('/authenticate/role/create')
 				);
 				$data = $this->crud->render_createForm();
 			break;
 			case 'view_edit':
+				/**
+				 * Edit form
+				 */
 				$this->crud->ItemId($id);
 				$this->crud->Link('update',
 					site_url('/authenticate/role/update/{item-index}')
@@ -214,11 +222,17 @@ class Authenticate extends CI_Controller {
 				}
 			break;
 			case 'create':
+				/**
+				 * Create action
+				 */
 				$id = $this->crud->action_create();
 		
 				redirect('/authenticate/role', 'refresh');
 			break;
 			case 'update':
+				/**
+				 * Edit action
+				 */
 				$this->crud->ItemId($id);
 				$this->crud->action_update();
 		
@@ -226,7 +240,9 @@ class Authenticate extends CI_Controller {
 			break;
 			case "list":
 			default:
-				/* display role list as default */
+				/**
+				 * display role list as default
+				 */
 				$this->crud->PageIndex($id>0?$id:1); // page-id must > 0
 				$this->crud->Link("view_edit",
 					site_url('/authenticate/role/view_edit/{item-index}'));
