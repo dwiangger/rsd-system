@@ -86,6 +86,7 @@ class CRUD {
 	 * 		$colname => array(
 	 * 			"header" => "", // Header to display in list and form label, default is colName 
 	 * 			"display" => array("view_list"|"view_detail"|...), // display this col in which view ? ref to _links
+	 * 			"width" => int, // with of cell in list table 
 	 * 			"primary" => TRUE/FALSE, // use to get primary key, just use 1 col 
 	 * 			"inputType" => "textarea"|"checkbox"|"select"|"multiple-select"|"radio"|"file-input"|"textbox", // guiding for rendering  
 	 * 			"inputData" => array(
@@ -124,13 +125,16 @@ class CRUD {
 		$indexColumn = FALSE;
 		$numRow = 0;
 		/* Init table */
-		$result = "\n<div class=\"crud-list-view\"><table>\n\t<tr>\n";
+		$result = "\n<div class=\"crud-list-view\">"
+			."<table class=\"table table-striped table-bordered table-condensed\">\n"
+			."\t<thead>\n"
+			."\t<tr>\n";
 		/* Checking for index column displaying */
 		if ( isset($this->_options['indexColumn']) && $this->_options['indexColumn'])
 		{
 			$indexColumn = TRUE;
 			$numRow++;	// For index column
-			$result .= "\t\t<th>#</th>\n"; // Header of ind 
+			$result .= "\t\t<th style=\"width:25px;text-align:right;\">#</th>\n"; // Header of ind 
 		}
 		/* Is editable or deletable - Action column*/
 		$actionColumn = FALSE;
@@ -149,17 +153,19 @@ class CRUD {
 				{
 					$header = $colDefine['header']; 
 				}
-				$result .= "\t\t<th>".$header."</th>\n";
+				$result .= "\t\t<th".(isset($colDefine['width'])?(" style=\"width:".$colDefine['width']."px;\""):'').">"
+					.$header."</th>\n";
 				$numRow++;// Calculate num rows 
 			}
 		}
 		/* display action column header */
 		if ($actionColumn)
 		{
-			$result .= "\t\t<th>Action</th>\n";
+			$result .= "\t\t<th style=\"width:60px;\">Action</th>\n";
 			$numRow++;
 		}
-		$result .= "\t</tr>\n";
+		$result .= "\t</tr>\n"
+			."\t</thead>\n";
 		
 		/* Display index from first item's index */
 		$i = ($this->_pageIndex-1)*$this->_pageSize;
@@ -169,7 +175,7 @@ class CRUD {
 			/* Index row */
 			if ($indexColumn)
 			{
-				$result .= "\t\t<td>".(++$i)."</td>\n";
+				$result .= "\t\t<td style=\"width:25px;text-align:right;\">".(++$i)."</td>\n";
 			}
 			/* data rows */
 			foreach ($this->_definitions as $colName => $colDefine) {
@@ -180,7 +186,7 @@ class CRUD {
 			}
 			/* Action column */
 			if ($actionColumn) {
-				$result .= "\t\t<td><div class=\"btn-group\">\n"
+				$result .= "\t\t<td style=\"width:60px;\"><div class=\"btn-group\">\n"
 					."\t\t\t<a class=\"btn btn-mini\" href=\"#\"><i class=\"icon-cog\"></i></a>\n"
 					."\t\t\t<a class=\"btn btn-mini dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\"><span class=\"caret\"></span></a>\n"
 					."\t\t\t<ul class=\"dropdown-menu\">\n";

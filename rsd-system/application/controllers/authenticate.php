@@ -184,7 +184,8 @@ class Authenticate extends CI_Controller {
 			),
 			'name' => array(
 				'display' => TRUE, 
-				'header' => "Name"
+				'header' => "Name",
+				'width' => 240
 			),
 			'description'=>array(
 				'display' => TRUE,
