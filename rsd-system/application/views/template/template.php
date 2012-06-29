@@ -54,6 +54,15 @@
             	{ 
             		?>
               <li><a href="<?= $this->config->item('base_url') ?>index.php/user/index/<?= $userInfo ?>">Profile</a></li>
+              <?php 
+              	if($this->acl->checkRole($userInfo,'admin'))
+              	{
+              		?>
+				<li class="divider"></li>
+				<li><a href="<?= site_url("admin") ?>">Admin</a></li>
+              		<?php 
+              	}
+              ?>
               <li class="divider"></li>
               <li><a href="<?= $this->config->item('base_url') ?>index.php/authenticate/logout">Sign Out</a></li>
             		<?php 
