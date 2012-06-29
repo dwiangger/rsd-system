@@ -812,6 +812,7 @@ class CRUD {
 		$query = $this->CI->db->select(implode(",", $selectList));
 		$query = $this->CI->db
 			->get();
+		$this->CI->db->flush_cache();
 		/* generate result list as an array */
 		$result = array();
 		foreach ($query->result() as $row) {
