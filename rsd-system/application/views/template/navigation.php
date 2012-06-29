@@ -25,15 +25,37 @@
 /**
  * Create default navbar in case. 
  */
-if ( !isset($nav) )
+if ( !isset($nav) 
+	|| count($nav) <= 0 )
 {
 	$nav = array(
 		array(
-			"name" => "Home",
+			"name" => "Project",
 			"link" => "#",
-			"active" => TRUE,
+			"active" => FALSE,
+			"child" => array(
+				/* All related project */
+		
+				/* All project link */
+				array(
+					"name" => "All project",
+					"link" => site_url("welcome/"),
+					"active" => FALSE
+				)
+			)
+		),
+		array(
+			"name" => "Task",
+			"link" => "#",
+			"active" => FALSE,
 			"child" => array()
-		)
+		),
+		array(
+			"name" => "Device",
+			"link" => "#",
+			"active" => FALSE,
+			"child" => array()
+		),
 	);
 }
 ?>
@@ -46,7 +68,7 @@ if ( !isset($nav) )
 			<li class="<?= $item["active"]?"active":"" ?><?= $hasChild?" dropdown":"" ?>">
 				<a class="<?= $hasChild?"dropdown-toggle":"" ?>"
 					<?= $hasChild?"data-toggle=\"dropdown\"":"" ?> 
-					href="<?= $this->config->item('base_url').$item["link"] ?>">
+					href="<?= $item["link"] ?>">
 					<?= $item["name"] ?>
 					<?= $hasChild?"<b class=\"caret\"></b>":"" ?>
 				</a>
@@ -60,7 +82,7 @@ if ( !isset($nav) )
 									?>
 					<li class="<?= $child["active"]?"active":"" ?>">
 						<a class="<?= $child["active"]?"active":"" ?>"
-							href="<?= $this->config->item('base_url').$child["link"] ?>">
+							href="<?= $child["link"] ?>">
 							<?= $child["name"] ?>
 						</a>
 					</li>
